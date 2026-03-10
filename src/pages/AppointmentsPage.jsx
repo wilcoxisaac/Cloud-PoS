@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
   Calendar, Plus, Clock, User, Phone, CheckCircle,
   XCircle, AlertCircle, ChevronLeft, ChevronRight,
-  Search, Filter, Scissors, Spa, Dumbbell, Edit2
+  Search, Filter, Scissors, Flower2 as Spa, Dumbbell, Edit2
 } from 'lucide-react'
 
 const SERVICES = [

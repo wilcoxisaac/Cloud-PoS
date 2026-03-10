@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
   Settings, Store, CreditCard, Users, Bell, Shield,
   Palette, Printer, Wifi, ChevronRight, CheckCircle,
-  Save, Edit2, Toggle, Globe, DollarSign, Clock,
+  Save, Edit2, ToggleLeft as Toggle, Globe, DollarSign, Clock,
   Zap, Building, Phone, Mail, MapPin
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
