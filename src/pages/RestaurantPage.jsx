@@ -145,7 +145,7 @@ export default function RestaurantPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Stats Bar */}
-      <div className="bg-white border-b border-neutral-100 px-6 py-3 flex items-center gap-6">
+      <div className="bg-white border-b border-neutral-100 px-4 sm:px-6 py-3 flex flex-wrap items-center gap-3 sm:gap-6">
         {[
           { label: 'Tables Occupied', value: `${stats.occupied}/${tables.length}`, color: '#00A3AD' },
           { label: 'Available', value: stats.available, color: '#00875A' },
@@ -158,7 +158,7 @@ export default function RestaurantPage() {
             <span className="text-sm font-700" style={{ color: 'var(--elavon-navy)' }}>{s.value}</span>
           </div>
         ))}
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto hidden sm:flex items-center gap-2">
           <span className="text-xs text-neutral-400">{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function RestaurantPage() {
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         {/* Floor Plan */}
         {activeTab === 'floor' && (
           <div>
@@ -188,7 +188,7 @@ export default function RestaurantPage() {
               </button>
             </div>
             {/* Legend */}
-            <div className="flex gap-4 mb-5">
+            <div className="flex flex-wrap gap-4 mb-5">
               {[
                 { color: 'bg-success border-success', label: 'Available' },
                 { color: 'bg-elavon-teal/10 border-elavon-teal', label: 'Occupied' },
@@ -234,7 +234,7 @@ export default function RestaurantPage() {
               <h3 className="font-600 text-elavon-navy">Today's Reservations</h3>
               <button className="btn-teal btn-sm"><Plus size={13} /> New Reservation</button>
             </div>
-            <div className="card overflow-hidden">
+            <div className="card overflow-hidden overflow-x-auto">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -280,7 +280,7 @@ export default function RestaurantPage() {
 
       {/* Table Detail Side Panel */}
       {selectedTable && (
-        <div className="fixed right-0 top-16 h-full w-80 bg-white border-l border-neutral-200 shadow-modal z-40 p-5 overflow-y-auto animate-slide-in">
+        <div className="fixed right-0 top-16 h-full w-full sm:w-80 bg-white border-l border-neutral-200 shadow-modal z-40 p-5 overflow-y-auto animate-slide-in">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-700" style={{ color: 'var(--elavon-navy)' }}>{selectedTable.name} Details</h3>
             <button onClick={() => setSelectedTable(null)} className="p-1.5 rounded-lg hover:bg-neutral-100">

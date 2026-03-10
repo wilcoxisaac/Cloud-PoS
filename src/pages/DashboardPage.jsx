@@ -114,9 +114,9 @@ export default function DashboardPage() {
   const todaySales = HOURLY_SALES.reduce((s, h) => s + h.sales, 0)
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-2xl mx-auto">
+    <div className="p-4 sm:p-6 space-y-6 max-w-screen-2xl mx-auto">
       {/* Welcome + Date */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-700" style={{ color: 'var(--elavon-navy)' }}>
             Good afternoon, Alex 👋
@@ -161,7 +161,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           icon={DollarSign} label="Today's Revenue" value={todaySales}
           change="+14.2%" positive color="#002D5C"

@@ -51,9 +51,8 @@ export default function LoyaltyPage() {
   const [search, setSearch] = useState('')
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-700 text-elavon-navy">Loyalty & Rewards</h1>
           <p className="text-sm text-neutral-500 mt-0.5">{STATS.totalMembers} members · {STATS.activeThisMonth} active this month</p>
@@ -70,8 +69,7 @@ export default function LoyaltyPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: 'Total Members', value: STATS.totalMembers, icon: Users, color: '#002D5C' },
           { label: 'Points Issued', value: STATS.pointsIssued.toLocaleString(), icon: Star, color: '#C06800' },
@@ -90,8 +88,7 @@ export default function LoyaltyPage() {
         ))}
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-neutral-200 gap-1">
+      <div className="flex border-b border-neutral-200 gap-1 overflow-x-auto">
         {[
           { key: 'overview', label: 'Overview' },
           { key: 'tiers', label: 'Tiers' },
@@ -101,7 +98,7 @@ export default function LoyaltyPage() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2.5 text-sm font-600 border-b-2 transition-colors ${
+            className={`px-4 py-2.5 text-sm font-600 border-b-2 transition-colors whitespace-nowrap ${
               activeTab === tab.key
                 ? 'border-elavon-teal text-elavon-teal'
                 : 'border-transparent text-neutral-500 hover:text-neutral-700'
@@ -113,9 +110,8 @@ export default function LoyaltyPage() {
       </div>
 
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-3 gap-6">
-          {/* Member distribution */}
-          <div className="col-span-2 card p-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 card p-5">
             <h3 className="font-700 text-elavon-navy mb-5">Member Distribution by Tier</h3>
             <div className="space-y-4">
               {[
@@ -143,7 +139,6 @@ export default function LoyaltyPage() {
             </div>
           </div>
 
-          {/* Recent Activity */}
           <div className="card p-5">
             <h3 className="font-700 text-elavon-navy mb-4">Live Activity</h3>
             <div className="space-y-3">
@@ -171,7 +166,7 @@ export default function LoyaltyPage() {
       )}
 
       {activeTab === 'tiers' && (
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {TIERS.map(tier => {
             const TierIcon = tier.icon
             return (
@@ -222,7 +217,7 @@ export default function LoyaltyPage() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {REWARDS.filter(r => r.name.toLowerCase().includes(search.toLowerCase())).map(reward => (
               <div key={reward.id} className={`card p-4 space-y-3 ${!reward.active ? 'opacity-60' : ''}`}>
                 <div className="flex items-start justify-between">
@@ -252,7 +247,6 @@ export default function LoyaltyPage() {
                 </div>
               </div>
             ))}
-            {/* Add new reward */}
             <div className="card p-4 border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center gap-2 text-neutral-400 hover:border-elavon-teal hover:text-elavon-teal cursor-pointer transition-colors min-h-40">
               <Plus size={24} />
               <span className="text-sm font-500">Add New Reward</span>
@@ -277,7 +271,7 @@ export default function LoyaltyPage() {
                       {ev.customer.split(' ').map(n => n[0]).join('')}
                     </span>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="font-600 text-sm text-elavon-navy">{ev.customer}</div>
                     <div className="text-xs text-neutral-500">{ev.detail}</div>
                   </div>
@@ -290,7 +284,7 @@ export default function LoyaltyPage() {
                     </div>
                     <div className="text-xs text-neutral-400">{ev.action}</div>
                   </div>
-                  <span className="text-xs text-neutral-400 w-16 text-right">{ev.time}</span>
+                  <span className="text-xs text-neutral-400 w-16 text-right hidden sm:block">{ev.time}</span>
                 </div>
               )
             })}
