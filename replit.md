@@ -1,6 +1,6 @@
 # Cloud POS
 
-A cloud-based Progressive Web App (PWA) Point of Sale solution powered by Elavon & US Bank. Mobile responsive, installable on iOS and Android, with a REST API backend.
+A cloud-based Progressive Web App (PWA) Point of Sale solution powered by Elavon & US Bank. Fully offline-capable, mobile responsive, installable on iOS and Android, with a REST API backend.
 
 ## Tech Stack
 
@@ -11,30 +11,37 @@ A cloud-based Progressive Web App (PWA) Point of Sale solution powered by Elavon
 - **Icons**: Lucide React
 - **HTTP**: Axios
 - **PWA**: Service Worker + Web App Manifest
+- **Offline Storage**: IndexedDB (via offlineStorage.js)
 
 ## Project Structure
 
 ```
 src/
   App.jsx              - Root component with routing
-  main.jsx             - Entry point (registers service worker)
+  main.jsx             - Entry point (registers SW, starts background sync)
   pwa.js               - Service worker registration + install prompt logic
   components/
-    layout/            - Header, Sidebar, Layout (mobile responsive)
+    layout/            - Header (with offline indicator), Sidebar, Layout
     pwa/
       InstallPrompt.jsx - PWA install banner (Android + iOS guide)
   context/
-    AppContext.jsx      - Global app state
-    POSContext.jsx      - POS-specific state (cart, products, customers)
+    AppContext.jsx      - Global app state (persisted to IndexedDB)
+    POSContext.jsx      - POS state (cart, products, customers, transactions - persisted)
+  hooks/
+    useOnlineStatus.js  - Online/offline detection hook
+  lib/
+    offlineStorage.js   - IndexedDB wrapper for offline data persistence
+    syncManager.js      - Background sync queue processor
   pages/               - Page components (all mobile responsive)
   styles/
-    index.css          - Global styles with Tailwind + Elavon design system + standalone mode
+    index.css          - Global styles + standalone mode safe area insets
 public/
   manifest.json        - Web App Manifest
-  sw.js                - Service Worker (stale-while-revalidate + API network-first)
+  sw.js                - Service Worker (full offline caching)
   favicon.svg          - App icon (SVG)
   apple-touch-icon.png - iOS home screen icon
   icons/               - PNG icons (72-512px + maskable variants)
+  fonts/               - Self-hosted Inter + JetBrains Mono fonts (offline-ready)
 server/
   index.js             - Express API server (serves static in production)
   data.js              - In-memory data store with sample data
@@ -82,10 +89,19 @@ All endpoints are prefixed with `/api`:
 - Run: `node server/index.js` (serves static files + API on port 5000)
 - Production PORT env var set to 5000
 
+## Offline Architecture
+
+- **Workbox Precaching**: VitePWA plugin (vite-plugin-pwa) generates a Workbox-based service worker at build time that deterministically precaches all 25+ assets (HTML, JS, CSS, 8 font files, 10 icons)
+- **API Caching**: NetworkFirst strategy with 5-second timeout for /api/ routes; falls back to cached responses when offline
+- **SPA Navigation**: NavigationRoute with fallback to cached index.html for all non-API routes
+- **Self-hosted Fonts**: Inter and JetBrains Mono served from /fonts/ (no CDN dependency)
+- **IndexedDB Persistence**: All app state (business, customers, transactions, products, notifications, activeEmployee) persisted to IndexedDB via offlineStorage.js
+- **Sync Queue**: Mutations made offline (transactions, customer updates) queued in IndexedDB; automatically synced to server when connection restored or immediately when online
+- **Online/Offline Indicator**: Header shows "Offline Mode" badge + "Elavon Offline" status when disconnected; reverts to "Elavon Live" when online
+
 ## Progressive Web App (PWA)
 
 - Installable on Android (Add to Home Screen prompt) and iOS (Safari share > Add to Home Screen)
-- Service Worker: stale-while-revalidate for app shell, network-first with offline fallback for API calls
 - Web App Manifest with full icon set (72-512px), maskable icons, app shortcuts
 - iOS meta tags: apple-mobile-web-app-capable, status bar style, touch icon, startup image
 - Standalone mode CSS: safe area insets for notch devices, disabled text selection, overscroll containment

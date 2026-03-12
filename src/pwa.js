@@ -5,10 +5,11 @@ export function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
       try {
-        const registration = await navigator.serviceWorker.register('/sw.js', {
+        const swUrl = import.meta.env.PROD ? '/sw.js' : '/sw.js';
+        const registration = await navigator.serviceWorker.register(swUrl, {
           scope: '/'
         });
-        
+
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           if (newWorker) {

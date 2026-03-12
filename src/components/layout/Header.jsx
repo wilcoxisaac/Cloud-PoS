@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import {
   Bell, Search, HelpCircle, ChevronDown, Check,
-  Zap, Info, AlertTriangle, X, Menu
+  Zap, Info, AlertTriangle, X, Menu, WifiOff, Wifi
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -30,6 +31,7 @@ function NotificationIcon({ type }) {
 export default function Header({ onToggleMobileMenu }) {
   const location = useLocation()
   const { notifications, unreadCount, markNotificationRead, markAllRead, business, businessType, setBusinessType } = useApp()
+  const isOnline = useOnlineStatus()
   const [showNotifs, setShowNotifs] = useState(false)
   const [showBizSwitch, setShowBizSwitch] = useState(false)
   const notifsRef = useRef()
@@ -144,9 +146,24 @@ export default function Header({ onToggleMobileMenu }) {
           )}
         </div>
 
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-500" style={{ background: 'rgba(0,163,173,0.08)', color: 'var(--elavon-teal-dark)' }}>
-          <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse-soft" />
-          <span>Elavon Live</span>
+        {!isOnline && (
+          <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-full text-xs font-500 bg-warning-light text-warning-dark">
+            <WifiOff size={13} />
+            <span className="hidden sm:inline">Offline Mode</span>
+          </div>
+        )}
+
+        <div className={clsx(
+          'hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-500',
+          isOnline
+            ? 'text-elavon-teal-dark'
+            : 'text-neutral-400'
+        )} style={isOnline ? { background: 'rgba(0,163,173,0.08)' } : { background: 'rgba(0,0,0,0.04)' }}>
+          <div className={clsx(
+            'w-1.5 h-1.5 rounded-full',
+            isOnline ? 'bg-success animate-pulse-soft' : 'bg-neutral-300'
+          )} />
+          <span>{isOnline ? 'Elavon Live' : 'Elavon Offline'}</span>
         </div>
       </div>
     </header>

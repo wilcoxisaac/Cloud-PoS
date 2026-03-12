@@ -1,7 +1,9 @@
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const STATIC_CACHE = 'cloud-pos-static-' + CACHE_VERSION;
 const APP_SHELL_CACHE = 'cloud-pos-shell-' + CACHE_VERSION;
-const ALL_CACHES = [STATIC_CACHE, APP_SHELL_CACHE];
+const FONT_CACHE = 'cloud-pos-fonts-' + CACHE_VERSION;
+const API_CACHE = 'cloud-pos-api-' + CACHE_VERSION;
+const ALL_CACHES = [STATIC_CACHE, APP_SHELL_CACHE, FONT_CACHE, API_CACHE];
 
 const PRECACHE_URLS = [
   '/',
@@ -37,9 +39,43 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   if (request.method !== 'GET') return;
+
+  if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((response) => {
+          const clone = response.clone();
+          caches.open(FONT_CACHE).then((cache) => cache.put(request, clone));
+          return response;
+        }).catch(() => new Response('', { status: 408 }));
+      })
+    );
+    return;
+  }
+
   if (url.origin !== location.origin) return;
 
   if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(API_CACHE).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request).then((cached) => {
+            if (cached) return cached;
+            return new Response(JSON.stringify({ offline: true, error: 'No cached data available' }), {
+              status: 503,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          });
+        })
+    );
     return;
   }
 
@@ -62,10 +98,7 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           if (response.ok) {
             const clone = response.clone();
-            const cacheName = url.pathname.match(/\.(js|css|png|svg|woff2?)$/)
-              ? STATIC_CACHE
-              : APP_SHELL_CACHE;
-            caches.open(cacheName).then((cache) => cache.put(request, clone));
+            caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
           }
           return response;
         })
