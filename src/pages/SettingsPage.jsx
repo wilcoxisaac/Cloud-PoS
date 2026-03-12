@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
   Settings, Store, CreditCard, Users, Bell, Shield,
   Palette, Printer, Wifi, ChevronRight, CheckCircle,
-  Save, Edit2, Toggle, Globe, DollarSign, Clock,
+  Save, Edit2, ToggleLeft as Toggle, Globe, DollarSign, Clock,
   Zap, Building, Phone, Mail, MapPin
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
@@ -71,31 +71,29 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-700 text-elavon-navy">Settings</h1>
           <p className="text-sm text-neutral-500 mt-0.5">Configure your Cloud POS system</p>
         </div>
         <button
           onClick={handleSave}
-          className={`btn flex items-center gap-2 transition-all ${saved ? 'btn-secondary text-success border-success' : 'btn-teal'}`}
+          className={`btn flex items-center gap-2 transition-all w-fit ${saved ? 'btn-secondary text-success border-success' : 'btn-teal'}`}
         >
           {saved ? <CheckCircle size={15} /> : <Save size={15} />}
           {saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
 
-      <div className="flex gap-6">
-        {/* Sidebar Nav */}
-        <div className="w-52 flex-shrink-0">
-          <div className="card p-2 space-y-0.5">
+      <div className="flex flex-col sm:flex-row gap-6">
+        <div className="sm:w-52 flex-shrink-0">
+          <div className="card p-2 flex sm:flex-col gap-0.5 overflow-x-auto">
             {SECTIONS.map(sec => (
               <button
                 key={sec.key}
                 onClick={() => setActiveSection(sec.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-500 transition-colors ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-500 transition-colors whitespace-nowrap flex-shrink-0 ${
                   activeSection === sec.key
                     ? 'bg-elavon-navy text-white'
                     : 'text-neutral-600 hover:bg-neutral-100'
@@ -108,12 +106,11 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 space-y-5">
+        <div className="flex-1 min-w-0 space-y-5">
           {activeSection === 'business' && (
             <div className="card p-5 space-y-5">
               <h3 className="font-700 text-elavon-navy border-b border-neutral-100 pb-3">Business Information</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <SettingsField label="Business Name" value={business.name} onChange={v => setBusiness(b => ({ ...b, name: v }))} />
                 <div className="space-y-1">
                   <label className="text-xs font-600 text-neutral-500 uppercase tracking-wide">Business Type</label>
@@ -129,7 +126,7 @@ export default function SettingsPage() {
                 </div>
                 <SettingsField label="Phone" value={business.phone} onChange={v => setBusiness(b => ({ ...b, phone: v }))} />
                 <SettingsField label="Tax Rate (%)" type="number" value={(business.tax_rate * 100).toFixed(3)} onChange={v => setBusiness(b => ({ ...b, tax_rate: parseFloat(v) / 100 }))} helper="e.g. 8.875 for Minneapolis, MN" />
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <SettingsField label="Address" value={business.address} onChange={v => setBusiness(b => ({ ...b, address: v }))} />
                 </div>
               </div>
@@ -144,7 +141,7 @@ export default function SettingsPage() {
                   <CheckCircle size={16} className="text-success" />
                   <span className="text-sm font-500 text-success">Connected to Elavon · Terminal T001 Ready</span>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
                     { label: 'Merchant ID', value: business.elavon.merchant_id },
                     { label: 'Terminal ID', value: business.elavon.terminal_id },
@@ -179,7 +176,7 @@ export default function SettingsPage() {
           {activeSection === 'tax' && (
             <div className="card p-5 space-y-5">
               <h3 className="font-700 text-elavon-navy border-b border-neutral-100 pb-3">Tax & Receipt Settings</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <SettingsField label="Tax Rate (%)" type="number" value={(business.tax_rate * 100).toFixed(3)} onChange={v => setBusiness(b => ({ ...b, tax_rate: parseFloat(v) / 100 }))} helper="Minneapolis, MN: 8.875%" />
                 <div className="space-y-1">
                   <label className="text-xs font-600 text-neutral-500 uppercase tracking-wide">Currency</label>
@@ -306,7 +303,7 @@ export default function SettingsPage() {
                       device.color === 'success' ? 'text-success' : device.color === 'warning' ? 'text-warning' : 'text-neutral-400'
                     } />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="font-600 text-sm text-elavon-navy">{device.title}</div>
                     <div className="text-xs text-neutral-400">{device.detail}</div>
                   </div>

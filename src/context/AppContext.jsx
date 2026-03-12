@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useCallback } from 'react'
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { saveAppState, loadAppState } from '../lib/offlineStorage'
 
 const AppContext = createContext(null)
 
-// Sample business data
 const INITIAL_BUSINESS = {
   name: 'The Corner Bistro',
-  type: 'restaurant', // 'restaurant' | 'retail' | 'services'
+  type: 'restaurant',
   address: '123 Main St, Minneapolis, MN 55401',
   phone: '(612) 555-0100',
   tax_rate: 0.08875,
@@ -37,9 +37,9 @@ const INITIAL_NOTIFICATIONS = [
 ]
 
 export function AppProvider({ children }) {
-  const [business, setBusiness] = useState(INITIAL_BUSINESS)
-  const [businessType, setBusinessType] = useState('restaurant')
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
+  const [business, setBusinessState] = useState(INITIAL_BUSINESS)
+  const [businessType, setBusinessTypeState] = useState('restaurant')
+  const [notifications, setNotificationsState] = useState(INITIAL_NOTIFICATIONS)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [theme, setTheme] = useState('light')
   const [activeEmployee, setActiveEmployee] = useState({
@@ -49,21 +49,64 @@ export function AppProvider({ children }) {
     pin: '1234',
     avatar: null,
   })
+  const [dataLoaded, setDataLoaded] = useState(false)
+
+  useEffect(() => {
+    async function loadSavedData() {
+      try {
+        const [savedBusiness, savedType, savedNotifications, savedEmployee] = await Promise.all([
+          loadAppState('business'),
+          loadAppState('businessType'),
+          loadAppState('notifications'),
+          loadAppState('activeEmployee'),
+        ])
+        if (savedBusiness) setBusinessState(savedBusiness)
+        if (savedType) setBusinessTypeState(savedType)
+        if (savedNotifications) setNotificationsState(savedNotifications)
+        if (savedEmployee) setActiveEmployee(savedEmployee)
+      } catch (e) {
+        console.log('Failed to load offline data:', e)
+      }
+      setDataLoaded(true)
+    }
+    loadSavedData()
+  }, [])
+
+  const setBusiness = useCallback((value) => {
+    setBusinessState((prev) => {
+      const next = typeof value === 'function' ? value(prev) : value
+      saveAppState('business', next).catch(() => {})
+      return next
+    })
+  }, [])
+
+  const setBusinessType = useCallback((value) => {
+    setBusinessTypeState(value)
+    saveAppState('businessType', value).catch(() => {})
+  }, [])
+
+  const setNotifications = useCallback((updater) => {
+    setNotificationsState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      saveAppState('notifications', next).catch(() => {})
+      return next
+    })
+  }, [])
 
   const markNotificationRead = useCallback((id) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
-  }, [])
+  }, [setNotifications])
 
   const markAllRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))
-  }, [])
+  }, [setNotifications])
 
   const addNotification = useCallback((notification) => {
     setNotifications(prev => [
       { id: Date.now(), ...notification, time: 'just now', read: false },
       ...prev
     ])
-  }, [])
+  }, [setNotifications])
 
   const unreadCount = notifications.filter(n => !n.read).length
 
@@ -83,7 +126,11 @@ export function AppProvider({ children }) {
       theme,
       setTheme,
       activeEmployee,
-      setActiveEmployee,
+      setActiveEmployee: (emp) => {
+        setActiveEmployee(emp)
+        saveAppState('activeEmployee', emp).catch(() => {})
+      },
+      dataLoaded,
     }}>
       {children}
     </AppContext.Provider>

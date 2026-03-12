@@ -14,12 +14,14 @@ import AnalyticsPage from './pages/AnalyticsPage'
 import BankingPage from './pages/BankingPage'
 import SettingsPage from './pages/SettingsPage'
 import LoyaltyPage from './pages/LoyaltyPage'
+import InstallPrompt from './components/pwa/InstallPrompt'
 
 export default function App() {
   return (
     <BrowserRouter>
       <AppProvider>
         <POSProvider>
+          <InstallPrompt />
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />

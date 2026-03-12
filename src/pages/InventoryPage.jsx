@@ -54,9 +54,9 @@ export default function InventoryPage() {
   const totalValue = INVENTORY_ITEMS.reduce((sum, i) => sum + i.quantity * i.cost, 0)
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-700 text-elavon-navy">Inventory</h1>
           <p className="text-sm text-neutral-500 mt-0.5">{INVENTORY_ITEMS.length} items tracked · Last synced just now</p>
@@ -64,25 +64,25 @@ export default function InventoryPage() {
         <div className="flex items-center gap-3">
           <button className="btn btn-secondary flex items-center gap-2">
             <Download size={15} />
-            Export
+            <span className="hidden sm:inline">Export</span>
           </button>
           <button className="btn btn-secondary flex items-center gap-2">
             <RefreshCw size={15} />
-            Sync
+            <span className="hidden sm:inline">Sync</span>
           </button>
           <button className="btn btn-teal flex items-center gap-2">
             <Plus size={15} />
-            Add Item
+            <span className="hidden sm:inline">Add Item</span>
           </button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="metric-card">
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#002D5C15' }}>
-              <Package size={20} style={{ color: '#002D5C' }} />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#0A163815' }}>
+              <Package size={20} style={{ color: '#0A1638' }} />
             </div>
           </div>
           <div className="mt-4">
@@ -140,7 +140,7 @@ export default function InventoryPage() {
             className="input pl-9 w-full"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto">
           {CATEGORIES.map(cat => (
             <button
               key={cat}

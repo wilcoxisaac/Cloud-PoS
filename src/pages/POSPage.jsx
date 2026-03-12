@@ -32,7 +32,6 @@ function PaymentModal({ total, onClose, onComplete }) {
 
   async function handleCharge() {
     setProcessing(true)
-    // Simulated Elavon Converge API call
     await new Promise(r => setTimeout(r, 1800))
     setProcessing(false)
     setDone(true)
@@ -42,8 +41,8 @@ function PaymentModal({ total, onClose, onComplete }) {
   if (done) {
     return (
       <div className="modal-backdrop">
-        <div className="modal-content max-w-sm animate-fade-in">
-          <div className="p-8 text-center">
+        <div className="modal-content max-w-sm md:max-w-sm w-full h-full md:h-auto md:w-auto animate-fade-in">
+          <div className="p-8 text-center flex flex-col items-center justify-center h-full md:h-auto">
             <div className="w-20 h-20 rounded-full bg-success-light flex items-center justify-center mx-auto mb-4">
               <CheckCircle size={36} className="text-success" />
             </div>
@@ -54,7 +53,7 @@ function PaymentModal({ total, onClose, onComplete }) {
             {method === 'cash' && change > 0 && (
               <p className="text-lg font-700 text-success mt-2">Change: ${change.toFixed(2)}</p>
             )}
-            <div className="mt-6 space-y-2">
+            <div className="mt-6 space-y-2 w-full">
               <div className="flex gap-2">
                 <button onClick={() => setReceiptMethod('print')} className="btn-secondary flex-1 justify-center">
                   <Printer size={15} /> Print Receipt
@@ -75,15 +74,14 @@ function PaymentModal({ total, onClose, onComplete }) {
 
   return (
     <div className="modal-backdrop">
-      <div className="modal-content max-w-md">
+      <div className="modal-content w-full h-full md:h-auto md:w-auto md:max-w-md">
         <div className="modal-header">
           <h2 className="text-lg font-700">Checkout · Elavon</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors">
             <X size={18} />
           </button>
         </div>
-        <div className="p-5 space-y-5">
-          {/* Tip Selection */}
+        <div className="p-5 space-y-5 overflow-y-auto flex-1">
           <div>
             <label className="text-xs font-600 text-neutral-500 uppercase tracking-wide mb-2 block">Add Tip</label>
             <div className="grid grid-cols-5 gap-2">
@@ -99,7 +97,6 @@ function PaymentModal({ total, onClose, onComplete }) {
             </div>
           </div>
 
-          {/* Totals */}
           <div className="bg-neutral-50 rounded-xl p-4 space-y-2">
             <div className="flex justify-between text-sm text-neutral-600"><span>Subtotal</span><span className="text-money">${total.toFixed(2)}</span></div>
             {tipAmount > 0 && <div className="flex justify-between text-sm text-neutral-600"><span>Tip ({tipPct}%)</span><span className="text-money">${tipAmount.toFixed(2)}</span></div>}
@@ -109,7 +106,6 @@ function PaymentModal({ total, onClose, onComplete }) {
             </div>
           </div>
 
-          {/* Payment Method */}
           <div>
             <label className="text-xs font-600 text-neutral-500 uppercase tracking-wide mb-2 block">Payment Method</label>
             <div className="grid grid-cols-3 gap-2">
@@ -127,7 +123,6 @@ function PaymentModal({ total, onClose, onComplete }) {
             </div>
           </div>
 
-          {/* Cash Entry */}
           {method === 'cash' && (
             <div>
               <label className="text-xs font-600 text-neutral-500 uppercase tracking-wide mb-2 block">Cash Received</label>
@@ -151,7 +146,6 @@ function PaymentModal({ total, onClose, onComplete }) {
             </div>
           )}
 
-          {/* Card / Digital Instructions */}
           {(method === 'card' || method === 'digital') && (
             <div className="bg-elavon-navy/5 rounded-xl p-4 text-center">
               <div className="w-12 h-12 rounded-xl bg-elavon-teal/15 flex items-center justify-center mx-auto mb-2">
@@ -166,7 +160,6 @@ function PaymentModal({ total, onClose, onComplete }) {
             </div>
           )}
 
-          {/* Charge Button */}
           <button
             onClick={handleCharge}
             disabled={processing || (method === 'cash' && cashAmt < finalTotal)}
@@ -203,6 +196,9 @@ export default function POSPage() {
   const [showCustomerPicker, setShowCustomerPicker] = useState(false)
   const [showDiscount, setShowDiscount] = useState(false)
   const [discountInput, setDiscountInput] = useState({ type: 'percent', value: '' })
+  const [mobileView, setMobileView] = useState('products')
+
+  const cartItemCount = cart.items.reduce((sum, i) => sum + i.qty, 0)
 
   const categories = CATEGORIES_BY_TYPE[businessType] || CATEGORIES_BY_TYPE.restaurant
   const filtered = useMemo(() => {
@@ -226,10 +222,11 @@ export default function POSPage() {
   }
 
   return (
-    <div className="flex h-full">
-      {/* Product Panel */}
-      <div className="flex-1 flex flex-col min-w-0 border-r border-neutral-200">
-        {/* Search + Categories */}
+    <div className="flex flex-col md:flex-row h-full relative">
+      <div className={clsx(
+        'flex-1 flex flex-col min-w-0 border-r border-neutral-200',
+        mobileView === 'cart' ? 'hidden md:flex' : 'flex'
+      )}>
         <div className="p-4 space-y-3 bg-white border-b border-neutral-100">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
@@ -252,7 +249,6 @@ export default function POSPage() {
           </div>
         </div>
 
-        {/* Product Grid */}
         <div className="flex-1 overflow-y-auto p-4">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-neutral-400">
@@ -279,28 +275,32 @@ export default function POSPage() {
         </div>
       </div>
 
-      {/* Cart Panel */}
-      <div className="w-80 xl:w-96 flex flex-col bg-white">
-        {/* Cart Header */}
+      <div className={clsx(
+        'w-full md:w-80 xl:w-96 flex flex-col bg-white',
+        mobileView === 'products' ? 'hidden md:flex' : 'flex flex-1'
+      )}>
         <div className="px-4 py-3 border-b border-neutral-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setMobileView('products')}
+              className="md:hidden p-1 rounded-lg hover:bg-neutral-100 transition-colors mr-1"
+            >
+              <ChevronDown size={16} className="rotate-90 text-neutral-500" />
+            </button>
             <UtensilsCrossed size={16} style={{ color: 'var(--elavon-navy)' }} />
             <span className="font-700 text-sm" style={{ color: 'var(--elavon-navy)' }}>
               Order {cart.tableName ? `· ${cart.tableName}` : ''}
             </span>
           </div>
           <div className="flex items-center gap-1">
-            {/* Customer */}
             <button onClick={() => setShowCustomerPicker(!showCustomerPicker)}
               className="p-1.5 rounded-lg hover:bg-neutral-100 transition-colors">
               <User size={15} className={cart.customer ? 'text-elavon-teal' : 'text-neutral-400'} />
             </button>
-            {/* Discount */}
             <button onClick={() => setShowDiscount(!showDiscount)}
               className="p-1.5 rounded-lg hover:bg-neutral-100 transition-colors">
               <Percent size={15} className={cart.discount ? 'text-elavon-teal' : 'text-neutral-400'} />
             </button>
-            {/* Clear */}
             {cart.items.length > 0 && (
               <button onClick={clearCart} className="p-1.5 rounded-lg hover:bg-danger/10 transition-colors">
                 <RotateCcw size={15} className="text-neutral-400 hover:text-danger" />
@@ -309,7 +309,6 @@ export default function POSPage() {
           </div>
         </div>
 
-        {/* Customer Badge */}
         {showCustomerPicker && (
           <div className="border-b border-neutral-100 p-3 bg-neutral-50">
             <div className="text-xs font-600 text-neutral-500 mb-2">Select Customer</div>
@@ -331,7 +330,6 @@ export default function POSPage() {
           </div>
         )}
 
-        {/* Discount Entry */}
         {showDiscount && (
           <div className="border-b border-neutral-100 p-3 bg-neutral-50">
             <div className="text-xs font-600 text-neutral-500 mb-2">Apply Discount</div>
@@ -354,7 +352,6 @@ export default function POSPage() {
           </div>
         )}
 
-        {/* Customer Info */}
         {cart.customer && (
           <div className="mx-3 mt-2 px-3 py-2 rounded-lg bg-elavon-teal/8 border border-elavon-teal/20 flex items-center gap-2">
             <User size={13} className="text-elavon-teal flex-shrink-0" />
@@ -368,7 +365,6 @@ export default function POSPage() {
           </div>
         )}
 
-        {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {cart.items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-neutral-300">
@@ -399,7 +395,7 @@ export default function POSPage() {
                   ${(item.price * item.qty).toFixed(2)}
                 </div>
                 <button onClick={() => removeFromCart(item.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:text-danger transition-all">
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:text-danger transition-all md:opacity-0 active:opacity-100">
                   <Trash2 size={13} className="text-neutral-300 hover:text-danger" />
                 </button>
               </div>
@@ -407,7 +403,6 @@ export default function POSPage() {
           )}
         </div>
 
-        {/* Order Totals */}
         <div className="border-t border-neutral-100 p-4 space-y-2">
           <div className="flex justify-between text-sm text-neutral-600">
             <span>Subtotal</span>
@@ -428,7 +423,6 @@ export default function POSPage() {
             <span className="text-money" style={{ color: 'var(--elavon-navy)' }}>${total.toFixed(2)}</span>
           </div>
 
-          {/* Charge Button */}
           <button
             onClick={() => setShowPayment(true)}
             disabled={cart.items.length === 0}
@@ -444,7 +438,21 @@ export default function POSPage() {
         </div>
       </div>
 
-      {/* Payment Modal */}
+      {mobileView === 'products' && (
+        <button
+          onClick={() => setMobileView('cart')}
+          className="md:hidden fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95"
+          style={{ background: 'var(--elavon-teal)' }}
+        >
+          <ShoppingCart size={22} className="text-white" />
+          {cartItemCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-700 flex items-center justify-center">
+              {cartItemCount}
+            </span>
+          )}
+        </button>
+      )}
+
       {showPayment && (
         <PaymentModal
           total={total}
@@ -456,7 +464,6 @@ export default function POSPage() {
   )
 }
 
-// ShoppingCart import fix
 function ShoppingCart(props) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>

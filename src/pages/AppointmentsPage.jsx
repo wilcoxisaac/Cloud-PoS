@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import {
   Calendar, Plus, Clock, User, Phone, CheckCircle,
   XCircle, AlertCircle, ChevronLeft, ChevronRight,
-  Search, Filter, Scissors, Spa, Dumbbell, Edit2
+  Search, Filter, Scissors, Flower2 as Spa, Dumbbell, Edit2
 } from 'lucide-react'
 
 const SERVICES = [
-  { id: 's1', name: 'Haircut & Style', duration: 45, price: 65.00, category: 'Hair', color: '#002D5C' },
-  { id: 's2', name: 'Color Treatment', duration: 90, price: 125.00, category: 'Hair', color: '#0073B1' },
+  { id: 's1', name: 'Haircut & Style', duration: 45, price: 65.00, category: 'Hair', color: '#0A1638' },
+  { id: 's2', name: 'Color Treatment', duration: 90, price: 125.00, category: 'Hair', color: '#1E3A6E' },
   { id: 's3', name: 'Deep Tissue Massage', duration: 60, price: 95.00, category: 'Massage', color: '#00A3AD' },
   { id: 's4', name: 'Manicure', duration: 30, price: 35.00, category: 'Nails', color: '#00BFC9' },
   { id: 's5', name: 'Pedicure', duration: 45, price: 55.00, category: 'Nails', color: '#007A83' },
@@ -45,7 +45,7 @@ function AppointmentCard({ appt }) {
     <div className="card p-4 hover:shadow-card-hover transition-all cursor-pointer">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: service?.color || '#002D5C' }} />
+          <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: service?.color || '#0A1638' }} />
           <div>
             <div className="font-700 text-sm text-elavon-navy">{appt.time}</div>
             <div className="text-xs text-neutral-400">{appt.duration} min</div>
@@ -105,9 +105,8 @@ export default function AppointmentsPage() {
     .reduce((s, a) => s + (SERVICES.find(svc => svc.name === a.service)?.price || 0), 0)
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-700 text-elavon-navy">Appointments</h1>
           <p className="text-sm text-neutral-500 mt-0.5">Monday, March 10, 2026 · {TODAY_APPOINTMENTS.length} appointments today</p>
@@ -133,13 +132,12 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
-      {/* Metrics */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: 'Completed', value: completedCount, icon: CheckCircle, color: '#00875A' },
           { label: 'Upcoming', value: confirmedCount, icon: Clock, color: '#00A3AD' },
           { label: 'Pending', value: pendingCount, icon: AlertCircle, color: '#FF8B00' },
-          { label: 'Revenue Today', value: `$${totalRevenue.toFixed(2)}`, icon: Calendar, color: '#002D5C' },
+          { label: 'Revenue Today', value: `$${totalRevenue.toFixed(2)}`, icon: Calendar, color: '#0A1638' },
         ].map(m => (
           <div key={m.label} className="metric-card">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${m.color}15` }}>
@@ -153,8 +151,7 @@ export default function AppointmentsPage() {
         ))}
       </div>
 
-      {/* Filters */}
-      <div className="card p-4 flex items-center gap-3">
+      <div className="card p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
           <input
@@ -165,23 +162,24 @@ export default function AppointmentsPage() {
             className="input pl-9 w-full"
           />
         </div>
-        {STAFF.map(s => (
-          <button
-            key={s}
-            onClick={() => setStaffFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-500 transition-colors ${
-              staffFilter === s ? 'bg-elavon-navy text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-            }`}
-          >
-            {s}
-          </button>
-        ))}
+        <div className="flex items-center gap-2 overflow-x-auto">
+          {STAFF.map(s => (
+            <button
+              key={s}
+              onClick={() => setStaffFilter(s)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-500 transition-colors whitespace-nowrap flex-shrink-0 ${
+                staffFilter === s ? 'bg-elavon-navy text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
       </div>
 
       {view === 'list' ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(a => <AppointmentCard key={a.id} appt={a} />)}
-          {/* New slot card */}
           <div className="card p-4 border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center gap-2 text-neutral-400 hover:border-elavon-teal hover:text-elavon-teal cursor-pointer transition-colors min-h-40">
             <Plus size={24} />
             <span className="text-sm font-500">Book New Slot</span>
@@ -196,12 +194,10 @@ export default function AppointmentsPage() {
           </div>
           <div className="overflow-x-auto">
             <div className="grid" style={{ gridTemplateColumns: '80px repeat(7, 1fr)', minWidth: 700 }}>
-              {/* Header */}
               <div className="border-b border-neutral-100 border-r border-neutral-100" />
               {DAYS.map(d => (
                 <div key={d} className="text-center py-3 text-xs font-600 text-neutral-400 uppercase border-b border-neutral-100 border-r border-neutral-100 last:border-r-0">{d}</div>
               ))}
-              {/* Time rows */}
               {HOURS.map(h => (
                 <React.Fragment key={h}>
                   <div className="text-xs text-neutral-400 px-2 py-4 border-r border-neutral-100 border-b border-neutral-50">{h}</div>

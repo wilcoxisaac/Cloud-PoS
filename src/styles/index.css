@@ -10,11 +10,11 @@
 @layer base {
   :root {
     /* Elavon Brand Colors */
-    --elavon-navy: #002D5C;
-    --elavon-navy-dark: #001A3A;
-    --elavon-navy-light: #003F7F;
-    --elavon-blue: #0073B1;
-    --elavon-blue-light: #0090DB;
+    --elavon-navy: #0A1638;
+    --elavon-navy-dark: #060E24;
+    --elavon-navy-light: #142252;
+    --elavon-blue: #1E3A6E;
+    --elavon-blue-light: #2B4F8C;
     --elavon-teal: #00A3AD;
     --elavon-teal-light: #00BFC9;
     --elavon-teal-dark: #007A83;
@@ -111,7 +111,7 @@
   /* --- Cards --- */
   .card {
     @apply bg-white rounded-xl border border-neutral-100;
-    box-shadow: 0 2px 8px rgba(0, 45, 92, 0.06);
+    box-shadow: 0 2px 8px rgba(10, 22, 56, 0.06);
   }
 
   .card-hover {
@@ -119,9 +119,9 @@
   }
 
   .card-hover:hover {
-    box-shadow: 0 8px 24px rgba(0, 45, 92, 0.12);
+    box-shadow: 0 8px 24px rgba(10, 22, 56, 0.12);
     transform: translateY(-1px);
-    border-color: rgba(0, 163, 173, 0.2);
+    border-color: rgba(10, 22, 56, 0.15);
   }
 
   .metric-card {
@@ -142,7 +142,7 @@
 
   .btn-primary:hover {
     background: var(--elavon-navy-light);
-    box-shadow: 0 4px 12px rgba(0, 45, 92, 0.3);
+    box-shadow: 0 4px 12px rgba(10, 22, 56, 0.35);
     transform: translateY(-1px);
   }
 
@@ -195,7 +195,7 @@
   }
 
   .btn-ghost:hover {
-    background: rgba(0, 45, 92, 0.06);
+    background: rgba(10, 22, 56, 0.06);
   }
 
   .btn-lg {
@@ -260,7 +260,7 @@
 
   .badge-navy {
     @apply badge;
-    background: rgba(0, 45, 92, 0.08);
+    background: rgba(10, 22, 56, 0.08);
     color: var(--elavon-navy);
   }
 
@@ -437,7 +437,7 @@
 
   .modal-content {
     @apply bg-white rounded-2xl overflow-hidden w-full;
-    box-shadow: 0 20px 60px rgba(0, 45, 92, 0.2);
+    box-shadow: 0 20px 60px rgba(10, 22, 56, 0.2);
     animation: fadeIn 0.2s ease-out;
   }
 
@@ -450,7 +450,7 @@
   /* --- Header --- */
   .app-header {
     @apply h-16 border-b border-neutral-100 bg-white flex items-center justify-between px-6;
-    box-shadow: 0 1px 4px rgba(0, 45, 92, 0.06);
+    box-shadow: 0 1px 4px rgba(10, 22, 56, 0.06);
   }
 
   /* --- Tabs --- */
@@ -595,5 +595,23 @@
   .text-money {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
+  }
+}
+
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior-y: contain;
+  }
+
+  input, textarea, select {
+    -webkit-user-select: auto;
+    user-select: auto;
   }
 }

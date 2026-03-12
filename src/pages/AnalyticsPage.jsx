@@ -42,9 +42,9 @@ const HOURLY_HEATMAP = [
 ]
 
 const CATEGORY_MIX = [
-  { name: 'Entrees', value: 42, color: '#002D5C' },
+  { name: 'Entrees', value: 42, color: '#0A1638' },
   { name: 'Drinks', value: 28, color: '#00A3AD' },
-  { name: 'Desserts', value: 15, color: '#0073B1' },
+  { name: 'Desserts', value: 15, color: '#1E3A6E' },
   { name: 'Salads', value: 10, color: '#00BFC9' },
   { name: 'Other', value: 5, color: '#D1DCE8' },
 ]
@@ -81,9 +81,8 @@ export default function AnalyticsPage() {
   const revenueGrowth = (((currentRevenue - prevRevenue) / prevRevenue) * 100).toFixed(1)
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-700 text-elavon-navy">Analytics</h1>
           <p className="text-sm text-neutral-500 mt-0.5">Business performance insights</p>
@@ -101,12 +100,11 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Revenue (Mar)', value: '$31,200', change: `${revenueGrowth > 0 ? '+' : ''}${revenueGrowth}% vs Feb`, positive: parseFloat(revenueGrowth) > 0, icon: DollarSign, color: '#002D5C' },
+          { label: 'Revenue (Mar)', value: '$31,200', change: `${revenueGrowth > 0 ? '+' : ''}${revenueGrowth}% vs Feb`, positive: parseFloat(revenueGrowth) > 0, icon: DollarSign, color: '#0A1638' },
           { label: 'Transactions', value: '441', change: '+6.3% vs Feb', positive: true, icon: ShoppingCart, color: '#00A3AD' },
-          { label: 'Avg Order Value', value: '$70.75', change: '+0.7% vs Feb', positive: true, icon: TrendingUp, color: '#0073B1' },
+          { label: 'Avg Order Value', value: '$70.75', change: '+0.7% vs Feb', positive: true, icon: TrendingUp, color: '#1E3A6E' },
           { label: 'New Customers', value: '48', change: '+12% vs Feb', positive: true, icon: Users, color: '#C06800' },
         ].map(m => (
           <div key={m.label} className="metric-card">
@@ -127,13 +125,12 @@ export default function AnalyticsPage() {
         ))}
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-neutral-200 gap-1">
+      <div className="flex border-b border-neutral-200 gap-1 overflow-x-auto">
         {['overview', 'items', 'customers'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2.5 text-sm font-600 border-b-2 capitalize transition-colors ${
+            className={`px-4 py-2.5 text-sm font-600 border-b-2 capitalize transition-colors whitespace-nowrap ${
               activeTab === tab
                 ? 'border-elavon-teal text-elavon-teal'
                 : 'border-transparent text-neutral-500 hover:text-neutral-700'
@@ -146,7 +143,6 @@ export default function AnalyticsPage() {
 
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          {/* Revenue Chart */}
           <div className="card p-5">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-700 text-elavon-navy">Monthly Revenue Trend</h3>
@@ -156,21 +152,20 @@ export default function AnalyticsPage() {
               <AreaChart data={MONTHLY_REVENUE}>
                 <defs>
                   <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#002D5C" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#002D5C" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#0A1638" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#0A1638" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#EBF0F7" />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#7B9AB5' }} axisLine={false} tickLine={false} />
                 <YAxis tickFormatter={v => `$${(v/1000).toFixed(0)}k`} tick={{ fontSize: 12, fill: '#7B9AB5' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="revenue" stroke="#002D5C" strokeWidth={2} fill="url(#revenueGrad)" name="Revenue" />
+                <Area type="monotone" dataKey="revenue" stroke="#0A1638" strokeWidth={2} fill="url(#revenueGrad)" name="Revenue" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            {/* Weekly Comparison */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="card p-5">
               <h3 className="font-700 text-elavon-navy mb-5">Week-over-Week Sales</h3>
               <ResponsiveContainer width="100%" height={220}>
@@ -179,16 +174,15 @@ export default function AnalyticsPage() {
                   <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#7B9AB5' }} axisLine={false} tickLine={false} />
                   <YAxis tickFormatter={v => `$${(v/1000).toFixed(1)}k`} tick={{ fontSize: 12, fill: '#7B9AB5' }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="thisWeek" fill="#002D5C" radius={[4, 4, 0, 0]} name="This Week" />
+                  <Bar dataKey="thisWeek" fill="#0A1638" radius={[4, 4, 0, 0]} name="This Week" />
                   <Bar dataKey="lastWeek" fill="#D1DCE8" radius={[4, 4, 0, 0]} name="Last Week" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Category Mix */}
             <div className="card p-5">
               <h3 className="font-700 text-elavon-navy mb-5">Revenue by Category</h3>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
                 <ResponsiveContainer width={180} height={180}>
                   <PieChart>
                     <Pie data={CATEGORY_MIX} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" strokeWidth={0}>
@@ -221,39 +215,41 @@ export default function AnalyticsPage() {
             <h3 className="font-700 text-elavon-navy">Top Selling Items</h3>
             <span className="text-sm text-neutral-500">March 2026</span>
           </div>
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-neutral-100">
-                {['#', 'Item', 'Category', 'Units Sold', 'Revenue', 'vs Last Month'].map(h => (
-                  <th key={h} className={`px-5 py-3 text-xs font-600 text-neutral-400 uppercase tracking-wide ${h === 'Units Sold' || h === 'Revenue' ? 'text-right' : 'text-left'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-50">
-              {TOP_ITEMS.map(item => (
-                <tr key={item.rank} className="hover:bg-neutral-50/50 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <span className="w-6 h-6 rounded-full bg-elavon-navy/10 flex items-center justify-center text-xs font-700 text-elavon-navy">{item.rank}</span>
-                  </td>
-                  <td className="px-5 py-3.5 font-600 text-sm text-elavon-navy">{item.name}</td>
-                  <td className="px-5 py-3.5"><span className="badge badge-navy">{item.category}</span></td>
-                  <td className="px-5 py-3.5 text-right font-600 text-sm text-neutral-700">{item.units}</td>
-                  <td className="px-5 py-3.5 text-right font-700 text-sm text-elavon-navy">${item.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-5 py-3.5">
-                    <span className={`flex items-center gap-1 text-xs font-600 ${item.positive ? 'text-success' : 'text-danger'}`}>
-                      {item.positive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                      {item.growth}
-                    </span>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-neutral-100">
+                  {['#', 'Item', 'Category', 'Units Sold', 'Revenue', 'vs Last Month'].map(h => (
+                    <th key={h} className={`px-5 py-3 text-xs font-600 text-neutral-400 uppercase tracking-wide ${h === 'Units Sold' || h === 'Revenue' ? 'text-right' : 'text-left'}`}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-neutral-50">
+                {TOP_ITEMS.map(item => (
+                  <tr key={item.rank} className="hover:bg-neutral-50/50 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <span className="w-6 h-6 rounded-full bg-elavon-navy/10 flex items-center justify-center text-xs font-700 text-elavon-navy">{item.rank}</span>
+                    </td>
+                    <td className="px-5 py-3.5 font-600 text-sm text-elavon-navy">{item.name}</td>
+                    <td className="px-5 py-3.5"><span className="badge badge-navy">{item.category}</span></td>
+                    <td className="px-5 py-3.5 text-right font-600 text-sm text-neutral-700">{item.units}</td>
+                    <td className="px-5 py-3.5 text-right font-700 text-sm text-elavon-navy">${item.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td className="px-5 py-3.5">
+                      <span className={`flex items-center gap-1 text-xs font-600 ${item.positive ? 'text-success' : 'text-danger'}`}>
+                        {item.positive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                        {item.growth}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {activeTab === 'customers' && (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="card p-5">
             <h3 className="font-700 text-elavon-navy mb-5">Customer Retention</h3>
             <ResponsiveContainer width="100%" height={220}>
@@ -270,8 +266,8 @@ export default function AnalyticsPage() {
             <h3 className="font-700 text-elavon-navy">Customer Segments</h3>
             {[
               { label: 'New Customers', pct: 28, count: 124, color: '#00A3AD' },
-              { label: 'Returning (2–5x)', pct: 42, count: 186, color: '#002D5C' },
-              { label: 'Loyal (6–20x)', pct: 22, count: 97, color: '#0073B1' },
+              { label: 'Returning (2–5x)', pct: 42, count: 186, color: '#0A1638' },
+              { label: 'Loyal (6–20x)', pct: 22, count: 97, color: '#1E3A6E' },
               { label: 'VIP (20x+)', pct: 8, count: 34, color: '#C06800' },
             ].map(seg => (
               <div key={seg.label}>

@@ -1,23 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import {
   Bell, Search, HelpCircle, ChevronDown, Check,
-  Zap, Info, AlertTriangle, X
+  Zap, Info, AlertTriangle, X, Menu, WifiOff, Wifi
 } from 'lucide-react'
 import clsx from 'clsx'
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
   '/pos': 'Point of Sale',
-  '/restaurant': 'Restaurant Management',
+  '/restaurant': 'Restaurant',
   '/inventory': 'Inventory',
   '/customers': 'Customers',
   '/loyalty': 'Loyalty & Rewards',
-  '/employees': 'Employee Management',
+  '/employees': 'Employees',
   '/appointments': 'Appointments',
-  '/analytics': 'Analytics & Reports',
-  '/banking': 'Banking — US Bank',
+  '/analytics': 'Analytics',
+  '/banking': 'Banking',
   '/settings': 'Settings',
 }
 
@@ -27,9 +28,10 @@ function NotificationIcon({ type }) {
   return <Info size={14} className="text-info" />
 }
 
-export default function Header() {
+export default function Header({ onToggleMobileMenu }) {
   const location = useLocation()
   const { notifications, unreadCount, markNotificationRead, markAllRead, business, businessType, setBusinessType } = useApp()
+  const isOnline = useOnlineStatus()
   const [showNotifs, setShowNotifs] = useState(false)
   const [showBizSwitch, setShowBizSwitch] = useState(false)
   const notifsRef = useRef()
@@ -48,11 +50,15 @@ export default function Header() {
 
   return (
     <header className="app-header">
-      {/* Left: Page Title */}
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg font-700" style={{ color: 'var(--elavon-navy)' }}>{title}</h1>
-        {/* Business Type Switcher */}
-        <div className="relative" ref={bizRef}>
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        <button
+          onClick={onToggleMobileMenu}
+          className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-500 md:hidden flex-shrink-0"
+        >
+          <Menu size={20} />
+        </button>
+        <h1 className="text-base sm:text-lg font-700 truncate" style={{ color: 'var(--elavon-navy)' }}>{title}</h1>
+        <div className="relative hidden sm:block" ref={bizRef}>
           <button
             onClick={() => setShowBizSwitch(!showBizSwitch)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 text-xs font-500 hover:border-elavon-teal transition-colors"
@@ -82,19 +88,15 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Right: Actions */}
-      <div className="flex items-center gap-2">
-        {/* Search */}
-        <button className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-elavon-navy transition-colors">
+      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+        <button className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-elavon-navy transition-colors hidden sm:block">
           <Search size={18} />
         </button>
 
-        {/* Help */}
-        <button className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-elavon-navy transition-colors">
+        <button className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-elavon-navy transition-colors hidden sm:block">
           <HelpCircle size={18} />
         </button>
 
-        {/* Notifications */}
         <div className="relative" ref={notifsRef}>
           <button
             onClick={() => setShowNotifs(!showNotifs)}
@@ -108,7 +110,7 @@ export default function Header() {
             )}
           </button>
           {showNotifs && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-neutral-200 rounded-xl shadow-dropdown z-50 animate-fade-in overflow-hidden">
+            <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white border border-neutral-200 rounded-xl shadow-dropdown z-50 animate-fade-in overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
                 <span className="font-600 text-sm" style={{ color: 'var(--elavon-navy)' }}>Notifications</span>
                 <button onClick={markAllRead} className="text-xs text-elavon-teal hover:text-elavon-teal-dark font-500">
@@ -144,10 +146,24 @@ export default function Header() {
           )}
         </div>
 
-        {/* Elavon Status Chip */}
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-500" style={{ background: 'rgba(0,163,173,0.08)', color: 'var(--elavon-teal-dark)' }}>
-          <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse-soft" />
-          <span>Elavon Live</span>
+        {!isOnline && (
+          <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-full text-xs font-500 bg-warning-light text-warning-dark">
+            <WifiOff size={13} />
+            <span className="hidden sm:inline">Offline Mode</span>
+          </div>
+        )}
+
+        <div className={clsx(
+          'hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-500',
+          isOnline
+            ? 'text-elavon-teal-dark'
+            : 'text-neutral-400'
+        )} style={isOnline ? { background: 'rgba(0,163,173,0.08)' } : { background: 'rgba(0,0,0,0.04)' }}>
+          <div className={clsx(
+            'w-1.5 h-1.5 rounded-full',
+            isOnline ? 'bg-success animate-pulse-soft' : 'bg-neutral-300'
+          )} />
+          <span>{isOnline ? 'Elavon Live' : 'Elavon Offline'}</span>
         </div>
       </div>
     </header>

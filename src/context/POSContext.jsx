@@ -1,11 +1,9 @@
-import React, { createContext, useContext, useState, useCallback, useReducer } from 'react'
+import React, { createContext, useContext, useState, useCallback, useReducer, useEffect } from 'react'
+import { saveAppState, loadAppState, addToSyncQueue } from '../lib/offlineStorage'
 
 const POSContext = createContext(null)
 
-// ─── Sample Products ────────────────────────────────────────────────────────
-
 export const SAMPLE_PRODUCTS = [
-  // Restaurant menu items
   { id: 'p001', name: 'House Burger', price: 14.99, category: 'Entrees', sku: 'BURG-001', emoji: '🍔', industry: 'restaurant', modifiers: ['Cheese', 'Bacon', 'Avocado'], tax: true },
   { id: 'p002', name: 'Caesar Salad', price: 11.50, category: 'Salads', sku: 'SAL-001', emoji: '🥗', industry: 'restaurant', modifiers: ['Extra Dressing', 'No Croutons', 'Add Chicken'], tax: true },
   { id: 'p003', name: 'Fish & Chips', price: 17.99, category: 'Entrees', sku: 'FISH-001', emoji: '🐟', industry: 'restaurant', modifiers: [], tax: true },
@@ -16,20 +14,16 @@ export const SAMPLE_PRODUCTS = [
   { id: 'p008', name: 'Tiramisu', price: 8.00, category: 'Desserts', sku: 'DES-001', emoji: '🍰', industry: 'restaurant', modifiers: [], tax: true },
   { id: 'p009', name: 'Chocolate Lava Cake', price: 9.50, category: 'Desserts', sku: 'DES-002', emoji: '🍫', industry: 'restaurant', modifiers: ['Ice Cream +1.50'], tax: true },
   { id: 'p010', name: 'Coffee', price: 4.00, category: 'Drinks', sku: 'BEV-004', emoji: '☕', industry: 'restaurant', modifiers: ['Oat Milk +0.75', 'Extra Shot +0.75'], tax: false },
-  // Retail items
   { id: 'r001', name: 'T-Shirt (M)', price: 24.99, category: 'Apparel', sku: 'APP-001', emoji: '👕', industry: 'retail', stock: 42, barcode: '123456789', tax: true },
   { id: 'r002', name: 'Denim Jeans', price: 59.99, category: 'Apparel', sku: 'APP-002', emoji: '👖', industry: 'retail', stock: 18, barcode: '987654321', tax: true },
   { id: 'r003', name: 'Sunglasses', price: 34.99, category: 'Accessories', sku: 'ACC-001', emoji: '🕶️', industry: 'retail', stock: 25, tax: true },
   { id: 'r004', name: 'Backpack', price: 49.99, category: 'Accessories', sku: 'ACC-002', emoji: '🎒', industry: 'retail', stock: 8, tax: true },
   { id: 'r005', name: 'Water Bottle', price: 19.99, category: 'Accessories', sku: 'ACC-003', emoji: '🧴', industry: 'retail', stock: 55, tax: true },
-  // Services
   { id: 's001', name: 'Haircut', price: 45.00, category: 'Hair', sku: 'SVC-001', emoji: '✂️', industry: 'services', duration: 45, tax: false },
   { id: 's002', name: 'Color Treatment', price: 120.00, category: 'Hair', sku: 'SVC-002', emoji: '🎨', industry: 'services', duration: 120, tax: false },
   { id: 's003', name: 'Manicure', price: 35.00, category: 'Nails', sku: 'SVC-003', emoji: '💅', industry: 'services', duration: 30, tax: false },
   { id: 's004', name: 'Massage (60 min)', price: 90.00, category: 'Spa', sku: 'SVC-004', emoji: '💆', industry: 'services', duration: 60, tax: false },
 ]
-
-// ─── Sample Customers ───────────────────────────────────────────────────────
 
 export const SAMPLE_CUSTOMERS = [
   { id: 'c001', name: 'Sarah Johnson', email: 'sarah.j@email.com', phone: '(612) 555-0201', points: 2450, tier: 'Gold', visits: 34, total_spend: 1847.50, last_visit: '2026-03-05', notes: 'Prefers window seat. Allergic to shellfish.' },
@@ -38,8 +32,6 @@ export const SAMPLE_CUSTOMERS = [
   { id: 'c004', name: 'Robert Garcia', email: 'rgarcia@email.com', phone: '(763) 555-0404', points: 150, tier: 'Bronze', visits: 3, total_spend: 89.50, last_visit: '2026-02-28', notes: '' },
   { id: 'c005', name: 'Jennifer Park', email: 'jpark@email.com', phone: '(952) 555-0505', points: 3100, tier: 'Gold', visits: 45, total_spend: 2890.00, last_visit: '2026-03-06', notes: 'Vegetarian. Large groups on weekends.' },
 ]
-
-// ─── Reducer ────────────────────────────────────────────────────────────────
 
 function cartReducer(state, action) {
   switch (action.type) {
@@ -93,15 +85,47 @@ function cartReducer(state, action) {
 
 const INITIAL_CART = { items: [], discount: null, customer: null, tip: 0, tableId: null, tableName: null }
 
-// ─── Provider ───────────────────────────────────────────────────────────────
-
 export function POSProvider({ children }) {
   const [cart, dispatch] = useReducer(cartReducer, INITIAL_CART)
-  const [products] = useState(SAMPLE_PRODUCTS)
-  const [customers, setCustomers] = useState(SAMPLE_CUSTOMERS)
-  const [transactions, setTransactions] = useState([])
+  const [products, setProducts] = useState(SAMPLE_PRODUCTS)
+  const [customers, setCustomersState] = useState(SAMPLE_CUSTOMERS)
+  const [transactions, setTransactionsState] = useState([])
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [activeCategory, setActiveCategory] = useState('All')
+
+  useEffect(() => {
+    async function loadSavedData() {
+      try {
+        const [savedCustomers, savedTransactions, savedProducts] = await Promise.all([
+          loadAppState('customers'),
+          loadAppState('transactions'),
+          loadAppState('products'),
+        ])
+        if (savedCustomers) setCustomersState(savedCustomers)
+        if (savedTransactions) setTransactionsState(savedTransactions)
+        if (savedProducts) setProducts(savedProducts)
+      } catch (e) {
+        console.log('Failed to load offline POS data:', e)
+      }
+    }
+    loadSavedData()
+  }, [])
+
+  const setCustomers = useCallback((updater) => {
+    setCustomersState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      saveAppState('customers', next).catch(() => {})
+      return next
+    })
+  }, [])
+
+  const setTransactions = useCallback((updater) => {
+    setTransactionsState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      saveAppState('transactions', next).catch(() => {})
+      return next
+    })
+  }, [])
 
   const addToCart = useCallback((item) => dispatch({ type: 'ADD_ITEM', item }), [])
   const removeFromCart = useCallback((id) => dispatch({ type: 'REMOVE_ITEM', id }), [])
@@ -143,6 +167,14 @@ export function POSProvider({ children }) {
       employee: 'Alex Rivera',
     }
     setTransactions(prev => [tx, ...prev])
+
+    addToSyncQueue({
+      type: 'transaction',
+      method: 'POST',
+      url: '/api/transactions',
+      body: tx,
+    }).catch(() => {})
+
     if (cart.customer) {
       setCustomers(prev => prev.map(c =>
         c.id === cart.customer.id
@@ -152,7 +184,7 @@ export function POSProvider({ children }) {
     }
     clearCart()
     return tx
-  }, [cart, subtotal, discountAmount, taxAmount, tipAmount, total, clearCart])
+  }, [cart, subtotal, discountAmount, taxAmount, tipAmount, total, clearCart, setTransactions, setCustomers])
 
   return (
     <POSContext.Provider value={{

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
   Users, Search, Plus, Star, DollarSign, ShoppingBag,
   Mail, Phone, MapPin, Edit2, Trash2, Eye, Filter,
-  TrendingUp, Award, ChevronRight, Calendar
+  TrendingUp, Award, ChevronRight, Calendar, X
 } from 'lucide-react'
 
 const CUSTOMERS = [
@@ -80,50 +80,53 @@ function CustomerDetailPanel({ customer, onClose }) {
   if (!customer) return null
   const tier = TIER_CONFIG[customer.tier]
   return (
-    <div className="w-80 card p-5 space-y-5 flex-shrink-0">
-      <div className="flex items-center justify-between">
-        <h3 className="font-700 text-elavon-navy">Customer Profile</h3>
-        <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600 text-lg leading-none">&times;</button>
-      </div>
-      <div className="text-center pb-4 border-b border-neutral-100">
-        <div className="w-16 h-16 rounded-full bg-elavon-navy/10 flex items-center justify-center mx-auto mb-3">
-          <span className="text-xl font-700 text-elavon-navy">{customer.name.split(' ').map(n => n[0]).join('')}</span>
+    <div className="fixed inset-0 z-50 sm:relative sm:inset-auto sm:z-auto">
+      <div className="fixed inset-0 bg-black/30 sm:hidden" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 w-80 max-w-full bg-white card p-5 space-y-5 flex-shrink-0 overflow-y-auto sm:relative sm:right-auto sm:top-auto sm:bottom-auto">
+        <div className="flex items-center justify-between">
+          <h3 className="font-700 text-elavon-navy">Customer Profile</h3>
+          <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600 text-lg leading-none">&times;</button>
         </div>
-        <div className="font-700 text-elavon-navy">{customer.name}</div>
-        <span className={`badge ${tier.bg} ${tier.text} mt-2`}>{tier.label} Member</span>
-      </div>
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-sm">
-          <Mail size={14} className="text-neutral-400" />
-          <span className="text-neutral-600">{customer.email}</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm">
-          <Phone size={14} className="text-neutral-400" />
-          <span className="text-neutral-600">{customer.phone}</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm">
-          <Calendar size={14} className="text-neutral-400" />
-          <span className="text-neutral-600">Member since {customer.joinDate}</span>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        {[
-          { label: 'Total Visits', value: customer.visits, icon: ShoppingBag, color: '#002D5C' },
-          { label: 'Total Spent', value: `$${customer.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: DollarSign, color: '#00A3AD' },
-          { label: 'Avg Order', value: `$${customer.avgOrder.toFixed(2)}`, icon: TrendingUp, color: '#0073B1' },
-          { label: 'Points', value: customer.loyaltyPoints.toLocaleString(), icon: Star, color: '#C06800' },
-        ].map(stat => (
-          <div key={stat.label} className="bg-neutral-50 rounded-xl p-3">
-            <stat.icon size={14} style={{ color: stat.color }} className="mb-1" />
-            <div className="font-700 text-sm text-elavon-navy">{stat.value}</div>
-            <div className="text-xs text-neutral-400">{stat.label}</div>
+        <div className="text-center pb-4 border-b border-neutral-100">
+          <div className="w-16 h-16 rounded-full bg-elavon-navy/10 flex items-center justify-center mx-auto mb-3">
+            <span className="text-xl font-700 text-elavon-navy">{customer.name.split(' ').map(n => n[0]).join('')}</span>
           </div>
-        ))}
+          <div className="font-700 text-elavon-navy">{customer.name}</div>
+          <span className={`badge ${tier.bg} ${tier.text} mt-2`}>{tier.label} Member</span>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm">
+            <Mail size={14} className="text-neutral-400" />
+            <span className="text-neutral-600">{customer.email}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Phone size={14} className="text-neutral-400" />
+            <span className="text-neutral-600">{customer.phone}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Calendar size={14} className="text-neutral-400" />
+            <span className="text-neutral-600">Member since {customer.joinDate}</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: 'Total Visits', value: customer.visits, icon: ShoppingBag, color: '#0A1638' },
+            { label: 'Total Spent', value: `$${customer.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: DollarSign, color: '#00A3AD' },
+            { label: 'Avg Order', value: `$${customer.avgOrder.toFixed(2)}`, icon: TrendingUp, color: '#1E3A6E' },
+            { label: 'Points', value: customer.loyaltyPoints.toLocaleString(), icon: Star, color: '#C06800' },
+          ].map(stat => (
+            <div key={stat.label} className="bg-neutral-50 rounded-xl p-3">
+              <stat.icon size={14} style={{ color: stat.color }} className="mb-1" />
+              <div className="font-700 text-sm text-elavon-navy">{stat.value}</div>
+              <div className="text-xs text-neutral-400">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+        <button className="btn btn-teal w-full flex items-center justify-center gap-2">
+          View Full History
+          <ChevronRight size={14} />
+        </button>
       </div>
-      <button className="btn btn-teal w-full flex items-center justify-center gap-2">
-        View Full History
-        <ChevronRight size={14} />
-      </button>
     </div>
   )
 }
@@ -144,9 +147,8 @@ export default function CustomersPage() {
   const avgOrderVal = CUSTOMERS.reduce((s, c) => s + c.avgOrder, 0) / CUSTOMERS.length
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-700 text-elavon-navy">Customers</h1>
           <p className="text-sm text-neutral-500 mt-0.5">{totalCustomers} registered customers</p>
@@ -163,12 +165,11 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      {/* Metrics */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Customers', value: totalCustomers, icon: Users, color: '#002D5C', raw: true },
+          { label: 'Total Customers', value: totalCustomers, icon: Users, color: '#0A1638', raw: true },
           { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: DollarSign, color: '#00A3AD', raw: true },
-          { label: 'Avg Order Value', value: `$${avgOrderVal.toFixed(2)}`, icon: TrendingUp, color: '#0073B1', raw: true },
+          { label: 'Avg Order Value', value: `$${avgOrderVal.toFixed(2)}`, icon: TrendingUp, color: '#1E3A6E', raw: true },
           { label: 'Loyalty Members', value: CUSTOMERS.filter(c => c.tier !== 'bronze').length, icon: Award, color: '#C06800', raw: true },
         ].map(m => (
           <div key={m.label} className="metric-card">
@@ -184,10 +185,8 @@ export default function CustomersPage() {
       </div>
 
       <div className="flex gap-6">
-        {/* Table */}
-        <div className="flex-1 space-y-4">
-          {/* Filters */}
-          <div className="card p-4 flex items-center gap-3">
+        <div className="flex-1 min-w-0 space-y-4">
+          <div className="card p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="relative flex-1">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
               <input
@@ -198,17 +197,19 @@ export default function CustomersPage() {
                 className="input pl-9 w-full"
               />
             </div>
-            {['All', 'Platinum', 'Gold', 'Silver', 'Bronze'].map(t => (
-              <button
-                key={t}
-                onClick={() => setTierFilter(t)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-500 transition-colors ${
-                  tierFilter === t ? 'bg-elavon-navy text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                }`}
-              >
-                {t}
-              </button>
-            ))}
+            <div className="flex items-center gap-2 overflow-x-auto">
+              {['All', 'Platinum', 'Gold', 'Silver', 'Bronze'].map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTierFilter(t)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-500 transition-colors whitespace-nowrap flex-shrink-0 ${
+                    tierFilter === t ? 'bg-elavon-navy text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="card overflow-hidden">
@@ -234,7 +235,6 @@ export default function CustomersPage() {
           </div>
         </div>
 
-        {/* Detail Panel */}
         {selected && <CustomerDetailPanel customer={selected} onClose={() => setSelected(null)} />}
       </div>
     </div>

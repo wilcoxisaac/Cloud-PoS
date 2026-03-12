@@ -35,9 +35,9 @@ const WEEKLY_DATA = [
 ]
 
 const CATEGORY_DATA = [
-  { name: 'Entrees', value: 42, color: '#002D5C' },
+  { name: 'Entrees', value: 42, color: '#0A1638' },
   { name: 'Drinks', value: 28, color: '#00A3AD' },
-  { name: 'Desserts', value: 15, color: '#0073B1' },
+  { name: 'Desserts', value: 15, color: '#1E3A6E' },
   { name: 'Salads', value: 10, color: '#00BFC9' },
   { name: 'Other', value: 5, color: '#D1DCE8' },
 ]
@@ -114,9 +114,9 @@ export default function DashboardPage() {
   const todaySales = HOURLY_SALES.reduce((s, h) => s + h.sales, 0)
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-2xl mx-auto">
+    <div className="p-4 sm:p-6 space-y-6 max-w-screen-2xl mx-auto">
       {/* Welcome + Date */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-700" style={{ color: 'var(--elavon-navy)' }}>
             Good afternoon, Alex 👋
@@ -161,10 +161,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           icon={DollarSign} label="Today's Revenue" value={todaySales}
-          change="+14.2%" positive color="#002D5C"
+          change="+14.2%" positive color="#0A1638"
         />
         <MetricCard
           icon={ShoppingCart} label="Transactions" value={284} prefix=""
@@ -172,7 +172,7 @@ export default function DashboardPage() {
         />
         <MetricCard
           icon={Users} label="Customers Served" value={198} prefix=""
-          change="+5.1%" positive color="#0073B1" raw
+          change="+5.1%" positive color="#1E3A6E" raw
         />
         <MetricCard
           icon={Clock} label="Avg Order Value" value={47.82}
@@ -244,7 +244,7 @@ export default function DashboardPage() {
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#7B9AB5' }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#7B9AB5' }} tickLine={false} axisLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="sales" fill="#002D5C" radius={[4, 4, 0, 0]} maxBarSize={32} />
+              <Bar dataKey="sales" fill="#0A1638" radius={[4, 4, 0, 0]} maxBarSize={32} />
             </BarChart>
           </ResponsiveContainer>
           <div className="mt-4 pt-4 border-t border-neutral-100 flex justify-between">
@@ -320,9 +320,9 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'New Sale', icon: ShoppingCart, path: '/pos', color: '#002D5C' },
+          { label: 'New Sale', icon: ShoppingCart, path: '/pos', color: '#0A1638' },
           { label: 'View Tables', icon: Calendar, path: '/restaurant', color: '#00A3AD' },
-          { label: 'Add Customer', icon: Users, path: '/customers', color: '#0073B1' },
+          { label: 'Add Customer', icon: Users, path: '/customers', color: '#1E3A6E' },
           { label: 'Run Report', icon: TrendingUp, path: '/analytics', color: '#00875A' },
         ].map(action => (
           <button
