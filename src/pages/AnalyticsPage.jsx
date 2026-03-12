@@ -5,18 +5,47 @@ import {
 } from 'recharts'
 import {
   TrendingUp, TrendingDown, DollarSign, ShoppingCart,
-  Users, Star, Download, Calendar, ChevronDown, BarChart3
+  Users, Star, Download, Calendar, ChevronDown, BarChart3, X, Check
 } from 'lucide-react'
 
-const MONTHLY_REVENUE = [
-  { month: 'Sep', revenue: 42800, transactions: 612, avgOrder: 69.93 },
-  { month: 'Oct', revenue: 48200, transactions: 698, avgOrder: 69.05 },
-  { month: 'Nov', revenue: 52100, transactions: 748, avgOrder: 69.65 },
-  { month: 'Dec', revenue: 68400, transactions: 962, avgOrder: 71.10 },
-  { month: 'Jan', revenue: 41200, transactions: 584, avgOrder: 70.55 },
-  { month: 'Feb', revenue: 47900, transactions: 682, avgOrder: 70.23 },
-  { month: 'Mar', revenue: 31200, transactions: 441, avgOrder: 70.75 },
-]
+const ALL_MONTHLY_DATA = {
+  'This Month': [
+    { month: 'Sep', revenue: 42800, transactions: 612, avgOrder: 69.93 },
+    { month: 'Oct', revenue: 48200, transactions: 698, avgOrder: 69.05 },
+    { month: 'Nov', revenue: 52100, transactions: 748, avgOrder: 69.65 },
+    { month: 'Dec', revenue: 68400, transactions: 962, avgOrder: 71.10 },
+    { month: 'Jan', revenue: 41200, transactions: 584, avgOrder: 70.55 },
+    { month: 'Feb', revenue: 47900, transactions: 682, avgOrder: 70.23 },
+    { month: 'Mar', revenue: 31200, transactions: 441, avgOrder: 70.75 },
+  ],
+  'Last Month': [
+    { month: 'Aug', revenue: 38400, transactions: 548, avgOrder: 70.07 },
+    { month: 'Sep', revenue: 42800, transactions: 612, avgOrder: 69.93 },
+    { month: 'Oct', revenue: 48200, transactions: 698, avgOrder: 69.05 },
+    { month: 'Nov', revenue: 52100, transactions: 748, avgOrder: 69.65 },
+    { month: 'Dec', revenue: 68400, transactions: 962, avgOrder: 71.10 },
+    { month: 'Jan', revenue: 41200, transactions: 584, avgOrder: 70.55 },
+    { month: 'Feb', revenue: 47900, transactions: 682, avgOrder: 70.23 },
+  ],
+  'Last 3 Months': [
+    { month: 'Oct', revenue: 48200, transactions: 698, avgOrder: 69.05 },
+    { month: 'Nov', revenue: 52100, transactions: 748, avgOrder: 69.65 },
+    { month: 'Dec', revenue: 68400, transactions: 962, avgOrder: 71.10 },
+  ],
+  'Last 6 Months': [
+    { month: 'Sep', revenue: 42800, transactions: 612, avgOrder: 69.93 },
+    { month: 'Oct', revenue: 48200, transactions: 698, avgOrder: 69.05 },
+    { month: 'Nov', revenue: 52100, transactions: 748, avgOrder: 69.65 },
+    { month: 'Dec', revenue: 68400, transactions: 962, avgOrder: 71.10 },
+    { month: 'Jan', revenue: 41200, transactions: 584, avgOrder: 70.55 },
+    { month: 'Feb', revenue: 47900, transactions: 682, avgOrder: 70.23 },
+  ],
+  'This Year': [
+    { month: 'Jan', revenue: 41200, transactions: 584, avgOrder: 70.55 },
+    { month: 'Feb', revenue: 47900, transactions: 682, avgOrder: 70.23 },
+    { month: 'Mar', revenue: 31200, transactions: 441, avgOrder: 70.75 },
+  ],
+}
 
 const WEEKLY_DATA = [
   { day: 'Mon', thisWeek: 3240, lastWeek: 2980 },
@@ -26,19 +55,6 @@ const WEEKLY_DATA = [
   { day: 'Fri', thisWeek: 7240, lastWeek: 6920 },
   { day: 'Sat', thisWeek: 8920, lastWeek: 8340 },
   { day: 'Sun', thisWeek: 6340, lastWeek: 5980 },
-]
-
-const HOURLY_HEATMAP = [
-  { hour: '8am', Mon: 120, Tue: 140, Wed: 110, Thu: 160, Fri: 180, Sat: 90, Sun: 70 },
-  { hour: '9am', Mon: 280, Tue: 310, Wed: 260, Thu: 340, Fri: 420, Sat: 380, Sun: 280 },
-  { hour: '10am', Mon: 380, Tue: 420, Wed: 360, Thu: 480, Fri: 520, Sat: 640, Sun: 480 },
-  { hour: '11am', Mon: 540, Tue: 580, Wed: 520, Thu: 610, Fri: 720, Sat: 880, Sun: 680 },
-  { hour: '12pm', Mon: 1240, Tue: 1380, Wed: 1180, Thu: 1420, Fri: 1640, Sat: 1920, Sun: 1540 },
-  { hour: '1pm', Mon: 1380, Tue: 1440, Wed: 1280, Thu: 1520, Fri: 1820, Sat: 2080, Sun: 1720 },
-  { hour: '2pm', Mon: 820, Tue: 860, Wed: 780, Thu: 940, Fri: 1020, Sat: 1280, Sun: 980 },
-  { hour: '6pm', Mon: 980, Tue: 1020, Wed: 940, Thu: 1120, Fri: 1680, Sat: 1920, Sun: 1440 },
-  { hour: '7pm', Mon: 1120, Tue: 1180, Wed: 1060, Thu: 1280, Fri: 1920, Sat: 2240, Sun: 1680 },
-  { hour: '8pm', Mon: 980, Tue: 1040, Wed: 920, Thu: 1180, Fri: 1780, Sat: 2020, Sun: 1480 },
 ]
 
 const CATEGORY_MIX = [
@@ -58,6 +74,8 @@ const TOP_ITEMS = [
   { rank: 6, name: 'Tiramisu', category: 'Desserts', units: 142, revenue: 1278.00, growth: '+31%', positive: true },
 ]
 
+const PERIODS = ['This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'This Year']
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
@@ -72,13 +90,64 @@ const CustomTooltip = ({ active, payload, label }) => {
   )
 }
 
+function exportToCSV(data, filename) {
+  if (!data || !data.length) return
+  const headers = Object.keys(data[0]).join(',')
+  const rows = data.map(row => Object.values(row).join(',')).join('\n')
+  const csv = `${headers}\n${rows}`
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState('This Month')
   const [activeTab, setActiveTab] = useState('overview')
+  const [showPeriodDropdown, setShowPeriodDropdown] = useState(false)
+  const [exportSuccess, setExportSuccess] = useState(false)
+
+  const MONTHLY_REVENUE = ALL_MONTHLY_DATA[period] || ALL_MONTHLY_DATA['This Month']
 
   const currentRevenue = MONTHLY_REVENUE[MONTHLY_REVENUE.length - 1].revenue
-  const prevRevenue = MONTHLY_REVENUE[MONTHLY_REVENUE.length - 2].revenue
+  const prevRevenue = MONTHLY_REVENUE[MONTHLY_REVENUE.length - 2]?.revenue || currentRevenue
   const revenueGrowth = (((currentRevenue - prevRevenue) / prevRevenue) * 100).toFixed(1)
+
+  const currentTransactions = MONTHLY_REVENUE[MONTHLY_REVENUE.length - 1].transactions
+  const prevTransactions = MONTHLY_REVENUE[MONTHLY_REVENUE.length - 2]?.transactions || currentTransactions
+  const txnGrowth = (((currentTransactions - prevTransactions) / prevTransactions) * 100).toFixed(1)
+
+  function handleExport() {
+    const exportData = activeTab === 'overview'
+      ? MONTHLY_REVENUE.map(r => ({
+          Month: r.month,
+          Revenue: r.revenue,
+          Transactions: r.transactions,
+          'Avg Order Value': r.avgOrder,
+        }))
+      : activeTab === 'items'
+      ? TOP_ITEMS.map(i => ({
+          Rank: i.rank,
+          Item: i.name,
+          Category: i.category,
+          'Units Sold': i.units,
+          Revenue: i.revenue,
+          'vs Last Month': i.growth,
+        }))
+      : MONTHLY_REVENUE.map(r => ({
+          Month: r.month,
+          Transactions: r.transactions,
+        }))
+
+    exportToCSV(exportData, `analytics-${activeTab}-${period.toLowerCase().replace(/\s+/g, '-')}.csv`)
+    setExportSuccess(true)
+    setTimeout(() => setExportSuccess(false), 2000)
+  }
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -88,24 +157,50 @@ export default function AnalyticsPage() {
           <p className="text-sm text-neutral-500 mt-0.5">Business performance insights</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="btn btn-secondary flex items-center gap-2">
-            <Calendar size={15} />
-            {period}
-            <ChevronDown size={13} />
-          </button>
-          <button className="btn btn-secondary flex items-center gap-2">
-            <Download size={15} />
-            Export Report
+          <div className="relative">
+            <button
+              onClick={() => setShowPeriodDropdown(!showPeriodDropdown)}
+              className="btn btn-secondary flex items-center gap-2"
+            >
+              <Calendar size={15} />
+              {period}
+              <ChevronDown size={13} className={`transition-transform ${showPeriodDropdown ? 'rotate-180' : ''}`} />
+            </button>
+            {showPeriodDropdown && (
+              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-neutral-200 rounded-xl shadow-dropdown z-20 overflow-hidden">
+                {PERIODS.map(p => (
+                  <button
+                    key={p}
+                    onClick={() => { setPeriod(p); setShowPeriodDropdown(false) }}
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 flex items-center justify-between transition-colors ${p === period ? 'text-elavon-teal font-600' : 'text-neutral-700'}`}
+                  >
+                    {p}
+                    {p === period && <Check size={13} className="text-elavon-teal" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={handleExport}
+            className={`btn flex items-center gap-2 transition-all ${exportSuccess ? 'btn-secondary text-success border-success' : 'btn-secondary'}`}
+          >
+            {exportSuccess ? <Check size={15} className="text-success" /> : <Download size={15} />}
+            {exportSuccess ? 'Exported!' : 'Export Report'}
           </button>
         </div>
       </div>
 
+      {showPeriodDropdown && (
+        <div className="fixed inset-0 z-10" onClick={() => setShowPeriodDropdown(false)} />
+      )}
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Revenue (Mar)', value: '$31,200', change: `${revenueGrowth > 0 ? '+' : ''}${revenueGrowth}% vs Feb`, positive: parseFloat(revenueGrowth) > 0, icon: DollarSign, color: '#0A1638' },
-          { label: 'Transactions', value: '441', change: '+6.3% vs Feb', positive: true, icon: ShoppingCart, color: '#00A3AD' },
-          { label: 'Avg Order Value', value: '$70.75', change: '+0.7% vs Feb', positive: true, icon: TrendingUp, color: '#1E3A6E' },
-          { label: 'New Customers', value: '48', change: '+12% vs Feb', positive: true, icon: Users, color: '#C06800' },
+          { label: `Revenue (${MONTHLY_REVENUE[MONTHLY_REVENUE.length - 1].month})`, value: `$${currentRevenue.toLocaleString()}`, change: `${revenueGrowth > 0 ? '+' : ''}${revenueGrowth}% vs prev`, positive: parseFloat(revenueGrowth) >= 0, icon: DollarSign, color: '#0A1638' },
+          { label: 'Transactions', value: currentTransactions.toLocaleString(), change: `${txnGrowth > 0 ? '+' : ''}${txnGrowth}% vs prev`, positive: parseFloat(txnGrowth) >= 0, icon: ShoppingCart, color: '#00A3AD' },
+          { label: 'Avg Order Value', value: `$${MONTHLY_REVENUE[MONTHLY_REVENUE.length - 1].avgOrder.toFixed(2)}`, change: '+0.7% vs prev', positive: true, icon: TrendingUp, color: '#1E3A6E' },
+          { label: 'New Customers', value: '48', change: '+12% vs prev', positive: true, icon: Users, color: '#C06800' },
         ].map(m => (
           <div key={m.label} className="metric-card">
             <div className="flex items-start justify-between">
@@ -146,7 +241,7 @@ export default function AnalyticsPage() {
           <div className="card p-5">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-700 text-elavon-navy">Monthly Revenue Trend</h3>
-              <span className="badge badge-teal">7 months</span>
+              <span className="badge badge-teal">{MONTHLY_REVENUE.length} months</span>
             </div>
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={MONTHLY_REVENUE}>
@@ -213,7 +308,7 @@ export default function AnalyticsPage() {
         <div className="card overflow-hidden">
           <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
             <h3 className="font-700 text-elavon-navy">Top Selling Items</h3>
-            <span className="text-sm text-neutral-500">March 2026</span>
+            <span className="text-sm text-neutral-500">{period}</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">

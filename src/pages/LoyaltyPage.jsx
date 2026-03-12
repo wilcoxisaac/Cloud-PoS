@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
   Star, Gift, Award, TrendingUp, Users, DollarSign,
   Plus, Search, ChevronRight, Zap, Crown, Shield,
-  Edit2, Trash2, CheckCircle, ArrowRight
+  Edit2, Trash2, CheckCircle, ArrowRight, X, Save
 } from 'lucide-react'
 
 const TIERS = [
@@ -12,7 +12,7 @@ const TIERS = [
   { name: 'Platinum', icon: Crown, min: 2500, max: Infinity, multiplier: 3, color: '#0A1638', bg: '#EBF0F7', perks: ['3x points', 'Personal concierge', 'All Gold perks + more'] },
 ]
 
-const REWARDS = [
+const INITIAL_REWARDS = [
   { id: 'r1', name: 'Free Dessert', points: 250, category: 'Food', active: true, redeemed: 48 },
   { id: 'r2', name: '$5 Off Next Visit', points: 500, category: 'Discount', active: true, redeemed: 124 },
   { id: 'r3', name: 'Free Appetizer', points: 350, category: 'Food', active: true, redeemed: 67 },
@@ -46,9 +46,207 @@ const STATS = {
   avgPointsBalance: 891,
 }
 
+const REWARD_CATEGORIES = ['Food', 'Discount', 'Beverage', 'Premium', 'Experience']
+
+// Mock member database for lookup
+const MOCK_MEMBERS = [
+  { name: 'Emily Chen', phone: '(612) 555-0101', email: 'emily.chen@email.com', points: 1284, tier: 'gold', visits: 42 },
+  { name: 'Marcus Williams', phone: '(651) 555-0182', email: 'marcus.w@email.com', points: 892, tier: 'silver', visits: 28 },
+  { name: 'Sarah Johnson', phone: '(612) 555-0234', email: 'sarah.j@email.com', points: 2341, tier: 'platinum', visits: 67 },
+  { name: 'David Park', phone: '(763) 555-0318', email: 'david.park@email.com', points: 348, tier: 'bronze', visits: 12 },
+  { name: 'Rachel Torres', phone: '(612) 555-0445', email: 'r.torres@email.com', points: 1876, tier: 'gold', visits: 55 },
+  { name: 'Aisha Thompson', phone: '(612) 555-0677', email: 'aisha.t@email.com', points: 3124, tier: 'platinum', visits: 91 },
+]
+
+function RewardModal({ reward, onSave, onClose }) {
+  const [form, setForm] = useState(reward || {
+    name: '', points: 500, category: 'Food', active: true,
+  })
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    onSave({
+      ...form,
+      id: reward?.id || `r${Date.now()}`,
+      points: parseInt(form.points) || 500,
+      redeemed: reward?.redeemed || 0,
+    })
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-modal overflow-hidden animate-fade-in">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
+          <h2 className="font-700 text-elavon-navy">{reward ? 'Edit Reward' : 'Add New Reward'}</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-neutral-100"><X size={16} /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          <div className="space-y-1">
+            <label className="text-xs font-600 text-neutral-500 uppercase tracking-wide">Reward Name *</label>
+            <input required className="input w-full" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Free Dessert" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-xs font-600 text-neutral-500 uppercase tracking-wide">Points Required</label>
+              <input type="number" min="1" required className="input w-full" value={form.points} onChange={e => setForm(f => ({ ...f, points: e.target.value }))} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-600 text-neutral-500 uppercase tracking-wide">Category</label>
+              <select className="input w-full" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                {REWARD_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="rounded" />
+            <span className="text-sm font-500 text-neutral-700">Active (visible to customers)</span>
+          </label>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="btn btn-secondary flex-1">Cancel</button>
+            <button type="submit" className="btn btn-teal flex-1 flex items-center justify-center gap-2">
+              <Save size={15} /> {reward ? 'Save Changes' : 'Add Reward'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function MemberLookupModal({ onClose }) {
+  const [query, setQuery] = useState('')
+  const results = MOCK_MEMBERS.filter(m =>
+    m.name.toLowerCase().includes(query.toLowerCase()) ||
+    m.phone.includes(query) ||
+    m.email.toLowerCase().includes(query.toLowerCase())
+  )
+  const [selected, setSelected] = useState(null)
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-modal overflow-hidden animate-fade-in">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
+          <h2 className="font-700 text-elavon-navy">Look Up Member</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-neutral-100"><X size={16} /></button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div className="relative">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              autoFocus
+              className="input pl-9 w-full"
+              value={query}
+              onChange={e => { setQuery(e.target.value); setSelected(null) }}
+              placeholder="Search by name, phone, or email…"
+            />
+          </div>
+          {query && !selected && (
+            <div className="border border-neutral-200 rounded-xl overflow-hidden max-h-56 overflow-y-auto">
+              {results.length === 0 ? (
+                <div className="p-4 text-sm text-neutral-400 text-center">No members found</div>
+              ) : results.map((m, i) => {
+                const tc = TIER_CONFIG[m.tier]
+                return (
+                  <button key={i} onClick={() => setSelected(m)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-50 border-b border-neutral-50 last:border-0 transition-colors">
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${tc.bg}`}>
+                      <span className="text-sm font-700" style={{ color: tc.color }}>{m.name.split(' ').map(n => n[0]).join('')}</span>
+                    </div>
+                    <div className="text-left flex-1 min-w-0">
+                      <div className="font-600 text-sm text-elavon-navy">{m.name}</div>
+                      <div className="text-xs text-neutral-400">{m.phone}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-700 text-sm text-elavon-teal">{m.points.toLocaleString()} pts</div>
+                      <div className={`text-xs font-500 ${tc.text}`}>{m.tier}</div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          {selected && (
+            <div className="border border-neutral-200 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${TIER_CONFIG[selected.tier].bg}`}>
+                  <span className="text-lg font-700" style={{ color: TIER_CONFIG[selected.tier].color }}>{selected.name.split(' ').map(n => n[0]).join('')}</span>
+                </div>
+                <div>
+                  <div className="font-700 text-elavon-navy">{selected.name}</div>
+                  <div className="text-xs text-neutral-400">{selected.email}</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Points', value: selected.points.toLocaleString(), icon: Star, color: '#C06800' },
+                  { label: 'Visits', value: selected.visits, icon: Users, color: '#0A1638' },
+                  { label: 'Tier', value: selected.tier.charAt(0).toUpperCase() + selected.tier.slice(1), icon: Award, color: '#00A3AD' },
+                ].map(s => (
+                  <div key={s.label} className="bg-neutral-50 rounded-xl p-3 text-center">
+                    <s.icon size={14} style={{ color: s.color }} className="mx-auto mb-1" />
+                    <div className="font-700 text-sm text-elavon-navy">{s.value}</div>
+                    <div className="text-xs text-neutral-400">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setSelected(null)} className="btn btn-secondary w-full text-sm">Search Again</button>
+            </div>
+          )}
+          <button onClick={onClose} className="btn btn-secondary w-full">Close</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function DeleteConfirm({ reward, onConfirm, onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white w-full max-w-sm rounded-2xl shadow-modal p-6 text-center animate-fade-in">
+        <div className="w-14 h-14 rounded-full bg-danger-light flex items-center justify-center mx-auto mb-4">
+          <Trash2 size={22} className="text-danger" />
+        </div>
+        <h3 className="font-700 text-elavon-navy mb-2">Remove Reward?</h3>
+        <p className="text-sm text-neutral-500 mb-6">Remove <span className="font-600 text-neutral-700">{reward.name}</span> from the catalog?</p>
+        <div className="flex gap-3">
+          <button onClick={onClose} className="btn btn-secondary flex-1">Cancel</button>
+          <button onClick={onConfirm} className="btn flex-1 bg-danger text-white hover:bg-danger/90">Remove</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function LoyaltyPage() {
+  const [rewards, setRewards] = useState(INITIAL_REWARDS)
   const [activeTab, setActiveTab] = useState('overview')
   const [search, setSearch] = useState('')
+  const [showRewardModal, setShowRewardModal] = useState(false)
+  const [editingReward, setEditingReward] = useState(null)
+  const [showLookup, setShowLookup] = useState(false)
+  const [deleteReward, setDeleteReward] = useState(null)
+
+  function handleSaveReward(r) {
+    setRewards(prev => {
+      const exists = prev.find(x => x.id === r.id)
+      if (exists) return prev.map(x => x.id === r.id ? r : x)
+      return [...prev, r]
+    })
+    setShowRewardModal(false)
+    setEditingReward(null)
+  }
+
+  function handleEditReward(r) {
+    setEditingReward(r)
+    setShowRewardModal(true)
+  }
+
+  function handleDeleteReward() {
+    setRewards(prev => prev.filter(r => r.id !== deleteReward.id))
+    setDeleteReward(null)
+  }
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -58,11 +256,11 @@ export default function LoyaltyPage() {
           <p className="text-sm text-neutral-500 mt-0.5">{STATS.totalMembers} members · {STATS.activeThisMonth} active this month</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="btn btn-secondary flex items-center gap-2">
+          <button onClick={() => setShowLookup(true)} className="btn btn-secondary flex items-center gap-2">
             <Search size={15} />
             Look Up Member
           </button>
-          <button className="btn btn-teal flex items-center gap-2">
+          <button onClick={() => { setEditingReward(null); setShowRewardModal(true) }} className="btn btn-teal flex items-center gap-2">
             <Plus size={15} />
             Add Reward
           </button>
@@ -95,15 +293,10 @@ export default function LoyaltyPage() {
           { key: 'rewards', label: 'Rewards Catalog' },
           { key: 'activity', label: 'Activity' },
         ].map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2.5 text-sm font-600 border-b-2 transition-colors whitespace-nowrap ${
-              activeTab === tab.key
-                ? 'border-elavon-teal text-elavon-teal'
-                : 'border-transparent text-neutral-500 hover:text-neutral-700'
-            }`}
-          >
+              activeTab === tab.key ? 'border-elavon-teal text-elavon-teal' : 'border-transparent text-neutral-500 hover:text-neutral-700'
+            }`}>
             {tab.label}
           </button>
         ))}
@@ -175,9 +368,6 @@ export default function LoyaltyPage() {
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: tier.bg }}>
                     <TierIcon size={22} style={{ color: tier.color }} />
                   </div>
-                  <button className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400">
-                    <Edit2 size={13} />
-                  </button>
                 </div>
                 <div>
                   <h3 className="font-700 text-lg" style={{ color: tier.color }}>{tier.name}</h3>
@@ -208,17 +398,11 @@ export default function LoyaltyPage() {
           <div className="card p-4 flex items-center gap-3">
             <div className="relative flex-1">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-              <input
-                type="text"
-                placeholder="Search rewards…"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="input pl-9 w-full"
-              />
+              <input type="text" placeholder="Search rewards…" value={search} onChange={e => setSearch(e.target.value)} className="input pl-9 w-full" />
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {REWARDS.filter(r => r.name.toLowerCase().includes(search.toLowerCase())).map(reward => (
+            {rewards.filter(r => r.name.toLowerCase().includes(search.toLowerCase())).map(reward => (
               <div key={reward.id} className={`card p-4 space-y-3 ${!reward.active ? 'opacity-60' : ''}`}>
                 <div className="flex items-start justify-between">
                   <div className="w-10 h-10 rounded-xl bg-elavon-teal/10 flex items-center justify-center">
@@ -226,10 +410,10 @@ export default function LoyaltyPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {!reward.active && <span className="badge bg-neutral-100 text-neutral-500">Inactive</span>}
-                    <button className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400">
+                    <button onClick={() => handleEditReward(reward)} className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400">
                       <Edit2 size={13} />
                     </button>
-                    <button className="p-1.5 rounded-lg hover:bg-danger-light text-neutral-400 hover:text-danger">
+                    <button onClick={() => setDeleteReward(reward)} className="p-1.5 rounded-lg hover:bg-danger-light text-neutral-400 hover:text-danger">
                       <Trash2 size={13} />
                     </button>
                   </div>
@@ -247,7 +431,10 @@ export default function LoyaltyPage() {
                 </div>
               </div>
             ))}
-            <div className="card p-4 border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center gap-2 text-neutral-400 hover:border-elavon-teal hover:text-elavon-teal cursor-pointer transition-colors min-h-40">
+            <div
+              onClick={() => { setEditingReward(null); setShowRewardModal(true) }}
+              className="card p-4 border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center gap-2 text-neutral-400 hover:border-elavon-teal hover:text-elavon-teal cursor-pointer transition-colors min-h-40"
+            >
               <Plus size={24} />
               <span className="text-sm font-500">Add New Reward</span>
             </div>
@@ -291,6 +478,16 @@ export default function LoyaltyPage() {
           </div>
         </div>
       )}
+
+      {showRewardModal && (
+        <RewardModal
+          reward={editingReward}
+          onSave={handleSaveReward}
+          onClose={() => { setShowRewardModal(false); setEditingReward(null) }}
+        />
+      )}
+      {showLookup && <MemberLookupModal onClose={() => setShowLookup(false)} />}
+      {deleteReward && <DeleteConfirm reward={deleteReward} onConfirm={handleDeleteReward} onClose={() => setDeleteReward(null)} />}
     </div>
   )
 }

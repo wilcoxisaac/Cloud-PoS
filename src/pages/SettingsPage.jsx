@@ -63,6 +63,34 @@ export default function SettingsPage() {
     staffClock: true,
     dailySummary: true,
   })
+  const [paymentToggles, setPaymentToggles] = useState({
+    creditCards: true,
+    amex: true,
+    contactless: true,
+    cash: true,
+    splitPayments: false,
+    refunds: true,
+  })
+  const [taxToggles, setTaxToggles] = useState({
+    printByDefault: false,
+    emailReceipt: true,
+    showTaxBreakdown: true,
+    includeLogo: true,
+    showLoyalty: true,
+  })
+  const [securityToggles, setSecurityToggles] = useState({
+    pinRefunds: true,
+    pinDiscounts: true,
+    autoLock: false,
+    logTransactions: true,
+    maskCards: true,
+  })
+  const [displayToggles, setDisplayToggles] = useState({
+    quickActions: true,
+    compactLayout: false,
+    animateTransitions: true,
+    highContrast: false,
+  })
   const [saved, setSaved] = useState(false)
 
   const handleSave = () => {
@@ -159,14 +187,14 @@ export default function SettingsPage() {
                 <h3 className="font-700 text-elavon-navy border-b border-neutral-100 pb-3 mb-4">Payment Methods</h3>
                 <div className="space-y-0">
                   {[
-                    { label: 'Accept Credit Cards', description: 'Visa, Mastercard, Discover', value: true },
-                    { label: 'Accept AMEX', description: '3.10% processing fee', value: true },
-                    { label: 'Accept Contactless / NFC', description: 'Apple Pay, Google Pay, tap-to-pay', value: true },
-                    { label: 'Accept Cash', description: 'Manual cash drawer management', value: true },
-                    { label: 'Allow Split Payments', description: 'Split a single order across multiple payment methods', value: false },
-                    { label: 'Allow Refunds', description: 'Managers and above can process refunds', value: true },
+                    { key: 'creditCards', label: 'Accept Credit Cards', description: 'Visa, Mastercard, Discover' },
+                    { key: 'amex', label: 'Accept AMEX', description: '3.10% processing fee' },
+                    { key: 'contactless', label: 'Accept Contactless / NFC', description: 'Apple Pay, Google Pay, tap-to-pay' },
+                    { key: 'cash', label: 'Accept Cash', description: 'Manual cash drawer management' },
+                    { key: 'splitPayments', label: 'Allow Split Payments', description: 'Split a single order across multiple payment methods' },
+                    { key: 'refunds', label: 'Allow Refunds', description: 'Managers and above can process refunds' },
                   ].map(item => (
-                    <ToggleSwitch key={item.label} {...item} onChange={() => {}} />
+                    <ToggleSwitch key={item.key} label={item.label} description={item.description} value={paymentToggles[item.key]} onChange={v => setPaymentToggles(t => ({ ...t, [item.key]: v }))} />
                   ))}
                 </div>
               </div>
@@ -191,13 +219,13 @@ export default function SettingsPage() {
                 <h4 className="font-600 text-sm text-elavon-navy mb-3">Receipt Options</h4>
                 <div className="space-y-0">
                   {[
-                    { label: 'Print Receipt by Default', description: 'Auto-print after every transaction', value: false },
-                    { label: 'Email Receipt Option', description: 'Offer digital receipt to customers', value: true },
-                    { label: 'Show Tax Breakdown', description: 'Display itemized tax on receipt', value: true },
-                    { label: 'Include Logo on Receipt', description: 'Print business logo at top', value: true },
-                    { label: 'Show Loyalty Points', description: 'Display earned and total points', value: true },
+                    { key: 'printByDefault', label: 'Print Receipt by Default', description: 'Auto-print after every transaction' },
+                    { key: 'emailReceipt', label: 'Email Receipt Option', description: 'Offer digital receipt to customers' },
+                    { key: 'showTaxBreakdown', label: 'Show Tax Breakdown', description: 'Display itemized tax on receipt' },
+                    { key: 'includeLogo', label: 'Include Logo on Receipt', description: 'Print business logo at top' },
+                    { key: 'showLoyalty', label: 'Show Loyalty Points', description: 'Display earned and total points' },
                   ].map(item => (
-                    <ToggleSwitch key={item.label} {...item} onChange={() => {}} />
+                    <ToggleSwitch key={item.key} label={item.label} description={item.description} value={taxToggles[item.key]} onChange={v => setTaxToggles(t => ({ ...t, [item.key]: v }))} />
                   ))}
                 </div>
               </div>
@@ -233,13 +261,13 @@ export default function SettingsPage() {
               <h3 className="font-700 text-elavon-navy border-b border-neutral-100 pb-3">Security Settings</h3>
               <div className="space-y-0">
                 {[
-                  { label: 'Require PIN for Refunds', description: 'Manager PIN required to process refunds', value: true },
-                  { label: 'Require PIN for Discounts', description: 'Manager PIN required for discounts over 15%', value: true },
-                  { label: 'Auto-Lock After Inactivity', description: 'Lock POS after 5 minutes of inactivity', value: false },
-                  { label: 'Log All Transactions', description: 'Maintain full audit trail for compliance', value: true },
-                  { label: 'Mask Card Numbers', description: 'Display only last 4 digits of card number', value: true },
+                  { key: 'pinRefunds', label: 'Require PIN for Refunds', description: 'Manager PIN required to process refunds' },
+                  { key: 'pinDiscounts', label: 'Require PIN for Discounts', description: 'Manager PIN required for discounts over 15%' },
+                  { key: 'autoLock', label: 'Auto-Lock After Inactivity', description: 'Lock POS after 5 minutes of inactivity' },
+                  { key: 'logTransactions', label: 'Log All Transactions', description: 'Maintain full audit trail for compliance' },
+                  { key: 'maskCards', label: 'Mask Card Numbers', description: 'Display only last 4 digits of card number' },
                 ].map(item => (
-                  <ToggleSwitch key={item.label} {...item} onChange={() => {}} />
+                  <ToggleSwitch key={item.key} label={item.label} description={item.description} value={securityToggles[item.key]} onChange={v => setSecurityToggles(t => ({ ...t, [item.key]: v }))} />
                 ))}
               </div>
               <div className="p-4 bg-info-light rounded-xl border border-info/20">
@@ -275,12 +303,12 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-0">
                 {[
-                  { label: 'Show Quick Actions Bar', description: 'Display shortcut buttons in POS header', value: true },
-                  { label: 'Compact Table Layout', description: 'Show more items per page in lists', value: false },
-                  { label: 'Animate Transitions', description: 'Enable smooth page transitions', value: true },
-                  { label: 'High Contrast Mode', description: 'Increase contrast for accessibility', value: false },
+                  { key: 'quickActions', label: 'Show Quick Actions Bar', description: 'Display shortcut buttons in POS header' },
+                  { key: 'compactLayout', label: 'Compact Table Layout', description: 'Show more items per page in lists' },
+                  { key: 'animateTransitions', label: 'Animate Transitions', description: 'Enable smooth page transitions' },
+                  { key: 'highContrast', label: 'High Contrast Mode', description: 'Increase contrast for accessibility' },
                 ].map(item => (
-                  <ToggleSwitch key={item.label} {...item} onChange={() => {}} />
+                  <ToggleSwitch key={item.key} label={item.label} description={item.description} value={displayToggles[item.key]} onChange={v => setDisplayToggles(t => ({ ...t, [item.key]: v }))} />
                 ))}
               </div>
             </div>

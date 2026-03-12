@@ -2,9 +2,27 @@ import React, { useState } from 'react'
 import {
   Landmark, DollarSign, TrendingUp, TrendingDown, ArrowUpRight,
   ArrowDownLeft, RefreshCw, Download, Shield, CreditCard,
-  CheckCircle, Clock, AlertCircle, Building, Lock, ChevronRight
+  CheckCircle, Clock, AlertCircle, Building, Lock, ChevronRight, Check
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+
+function exportToCSV(data, filename) {
+  if (!data || !data.length) return
+  const headers = Object.keys(data[0]).join(',')
+  const rows = data.map(row =>
+    Object.values(row).map(v => (typeof v === 'string' && v.includes(',') ? `"${v}"` : v)).join(',')
+  ).join('\n')
+  const csv = `${headers}\n${rows}`
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
 
 const TRANSACTIONS = [
   { id: 'TXN-20260310-001', type: 'deposit', description: 'Daily Settlement – Elavon', amount: 4821.50, date: '2026-03-10', status: 'completed', method: 'ACH' },
@@ -30,11 +48,28 @@ const SETTLEMENT_BATCHES = [
 export default function BankingPage() {
   const { business } = useApp()
   const [activeTab, setActiveTab] = useState('overview')
+  const [syncing, setSyncing] = useState(false)
+  const [syncDone, setSyncDone] = useState(false)
+  const [exportDone, setExportDone] = useState(false)
   const usbank = business.usbank
 
   const totalDeposits = TRANSACTIONS.filter(t => t.type === 'deposit' && t.status === 'completed').reduce((s, t) => s + t.amount, 0)
   const totalWithdrawals = TRANSACTIONS.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((s, t) => s + t.amount, 0)
   const pendingAmount = TRANSACTIONS.filter(t => t.status === 'pending').reduce((s, t) => s + t.amount, 0)
+
+  function handleSync() {
+    setSyncing(true)
+    setTimeout(() => { setSyncing(false); setSyncDone(true); setTimeout(() => setSyncDone(false), 2000) }, 1500)
+  }
+
+  function handleExport() {
+    const data = activeTab === 'settlements'
+      ? SETTLEMENT_BATCHES.map(b => ({ Date: b.date, Transactions: b.transactions, Gross: b.gross, Fees: b.fees, Net: b.net, Status: b.status }))
+      : TRANSACTIONS.map(t => ({ ID: t.id, Date: t.date, Description: t.description, Method: t.method, Type: t.type, Amount: t.amount, Status: t.status }))
+    exportToCSV(data, `banking-${activeTab}-export.csv`)
+    setExportDone(true)
+    setTimeout(() => setExportDone(false), 2000)
+  }
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -44,13 +79,13 @@ export default function BankingPage() {
           <p className="text-sm text-neutral-500 mt-0.5">Powered by US Bank · Integrated Elavon settlements</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="btn btn-secondary flex items-center gap-2">
-            <RefreshCw size={15} />
-            Sync
+          <button onClick={handleSync} disabled={syncing} className={`btn btn-secondary flex items-center gap-2 transition-all ${syncDone ? 'text-success border-success' : ''}`}>
+            {syncDone ? <Check size={15} className="text-success" /> : <RefreshCw size={15} className={syncing ? 'animate-spin' : ''} />}
+            {syncDone ? 'Synced!' : syncing ? 'Syncing…' : 'Sync'}
           </button>
-          <button className="btn btn-secondary flex items-center gap-2">
-            <Download size={15} />
-            Export
+          <button onClick={handleExport} className={`btn btn-secondary flex items-center gap-2 transition-all ${exportDone ? 'text-success border-success' : ''}`}>
+            {exportDone ? <Check size={15} className="text-success" /> : <Download size={15} />}
+            {exportDone ? 'Exported!' : 'Export'}
           </button>
         </div>
       </div>
