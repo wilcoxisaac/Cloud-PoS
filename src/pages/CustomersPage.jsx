@@ -110,9 +110,9 @@ function CustomerDetailPanel({ customer, onClose }) {
         </div>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: 'Total Visits', value: customer.visits, icon: ShoppingBag, color: '#002D5C' },
+            { label: 'Total Visits', value: customer.visits, icon: ShoppingBag, color: '#0A1638' },
             { label: 'Total Spent', value: `$${customer.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: DollarSign, color: '#00A3AD' },
-            { label: 'Avg Order', value: `$${customer.avgOrder.toFixed(2)}`, icon: TrendingUp, color: '#0073B1' },
+            { label: 'Avg Order', value: `$${customer.avgOrder.toFixed(2)}`, icon: TrendingUp, color: '#1E3A6E' },
             { label: 'Points', value: customer.loyaltyPoints.toLocaleString(), icon: Star, color: '#C06800' },
           ].map(stat => (
             <div key={stat.label} className="bg-neutral-50 rounded-xl p-3">
@@ -167,9 +167,9 @@ export default function CustomersPage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Customers', value: totalCustomers, icon: Users, color: '#002D5C', raw: true },
+          { label: 'Total Customers', value: totalCustomers, icon: Users, color: '#0A1638', raw: true },
           { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: DollarSign, color: '#00A3AD', raw: true },
-          { label: 'Avg Order Value', value: `$${avgOrderVal.toFixed(2)}`, icon: TrendingUp, color: '#0073B1', raw: true },
+          { label: 'Avg Order Value', value: `$${avgOrderVal.toFixed(2)}`, icon: TrendingUp, color: '#1E3A6E', raw: true },
           { label: 'Loyalty Members', value: CUSTOMERS.filter(c => c.tier !== 'bronze').length, icon: Award, color: '#C06800', raw: true },
         ].map(m => (
           <div key={m.label} className="metric-card">

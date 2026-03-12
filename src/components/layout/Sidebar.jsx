@@ -1,10 +1,11 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
+import ElavonLogo from '../ElavonLogo'
 import {
   LayoutDashboard, ShoppingCart, UtensilsCrossed, Package,
   Users, Star, Clock, Calendar, BarChart3, Landmark,
-  Settings, ChevronLeft, ChevronRight, Zap, Menu,
+  Settings, ChevronLeft, ChevronRight, Menu,
   CreditCard, Bell, LogOut, User, Shield, X
 } from 'lucide-react'
 import clsx from 'clsx'
@@ -42,8 +43,8 @@ export default function Sidebar({ mobileMenuOpen, onCloseMobile }) {
       collapsed && 'md:w-16'
     )}>
       <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
-        <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-teal flex items-center justify-center">
-          <Zap size={18} className="text-white" strokeWidth={2.5} />
+        <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-white flex items-center justify-center">
+          <ElavonLogo size={22} color="#0A1638" />
         </div>
         <div className={clsx('min-w-0', collapsed && 'hidden md:hidden', collapsed || 'block')}>
           <div className="text-white font-700 text-sm leading-tight truncate">Cloud POS</div>

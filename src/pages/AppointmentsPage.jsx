@@ -6,8 +6,8 @@ import {
 } from 'lucide-react'
 
 const SERVICES = [
-  { id: 's1', name: 'Haircut & Style', duration: 45, price: 65.00, category: 'Hair', color: '#002D5C' },
-  { id: 's2', name: 'Color Treatment', duration: 90, price: 125.00, category: 'Hair', color: '#0073B1' },
+  { id: 's1', name: 'Haircut & Style', duration: 45, price: 65.00, category: 'Hair', color: '#0A1638' },
+  { id: 's2', name: 'Color Treatment', duration: 90, price: 125.00, category: 'Hair', color: '#1E3A6E' },
   { id: 's3', name: 'Deep Tissue Massage', duration: 60, price: 95.00, category: 'Massage', color: '#00A3AD' },
   { id: 's4', name: 'Manicure', duration: 30, price: 35.00, category: 'Nails', color: '#00BFC9' },
   { id: 's5', name: 'Pedicure', duration: 45, price: 55.00, category: 'Nails', color: '#007A83' },
@@ -45,7 +45,7 @@ function AppointmentCard({ appt }) {
     <div className="card p-4 hover:shadow-card-hover transition-all cursor-pointer">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: service?.color || '#002D5C' }} />
+          <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: service?.color || '#0A1638' }} />
           <div>
             <div className="font-700 text-sm text-elavon-navy">{appt.time}</div>
             <div className="text-xs text-neutral-400">{appt.duration} min</div>
@@ -137,7 +137,7 @@ export default function AppointmentsPage() {
           { label: 'Completed', value: completedCount, icon: CheckCircle, color: '#00875A' },
           { label: 'Upcoming', value: confirmedCount, icon: Clock, color: '#00A3AD' },
           { label: 'Pending', value: pendingCount, icon: AlertCircle, color: '#FF8B00' },
-          { label: 'Revenue Today', value: `$${totalRevenue.toFixed(2)}`, icon: Calendar, color: '#002D5C' },
+          { label: 'Revenue Today', value: `$${totalRevenue.toFixed(2)}`, icon: Calendar, color: '#0A1638' },
         ].map(m => (
           <div key={m.label} className="metric-card">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${m.color}15` }}>

@@ -8,7 +8,7 @@ A cloud-based Progressive Web App (PWA) Point of Sale solution powered by Elavon
 - **Backend**: Express.js REST API
 - **Routing**: React Router v6
 - **Charts**: Recharts
-- **Icons**: Lucide React
+- **Icons**: Lucide React + Custom ElavonLogo component
 - **HTTP**: Axios
 - **PWA**: Service Worker + Web App Manifest
 - **Offline Storage**: IndexedDB (via offlineStorage.js)
@@ -21,6 +21,7 @@ src/
   main.jsx             - Entry point (registers SW, starts background sync)
   pwa.js               - Service worker registration + install prompt logic
   components/
+    ElavonLogo.jsx     - Elavon M-mark logo SVG component (reusable, configurable size/color)
     layout/            - Header (with offline indicator), Sidebar, Layout
     pwa/
       InstallPrompt.jsx - PWA install banner (Android + iOS guide)
@@ -38,7 +39,7 @@ src/
 public/
   manifest.json        - Web App Manifest
   sw.js                - Service Worker (full offline caching)
-  favicon.svg          - App icon (SVG)
+  favicon.svg          - Elavon M-mark favicon (navy background, white mark)
   apple-touch-icon.png - iOS home screen icon
   icons/               - PNG icons (72-512px + maskable variants)
   fonts/               - Self-hosted Inter + JetBrains Mono fonts (offline-ready)

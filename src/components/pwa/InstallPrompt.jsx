@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Download, X, Smartphone } from 'lucide-react'
 import { promptInstall, isStandalone, isIOS, isSafari, onInstallAvailable } from '../../pwa'
+import ElavonLogo from '../ElavonLogo'
 
 export default function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false)
@@ -38,8 +39,8 @@ export default function InstallPrompt() {
     return (
       <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-white rounded-2xl shadow-2xl border border-neutral-200 p-4 z-[100] animate-slide-up">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-elavon-navy to-elavon-navy-light flex items-center justify-center">
-            <Smartphone size={20} className="text-elavon-teal-light" />
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-elavon-navy flex items-center justify-center">
+            <ElavonLogo size={24} color="#FFFFFF" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-600 text-sm text-neutral-900">Install Cloud POS</h3>
@@ -62,8 +63,8 @@ export default function InstallPrompt() {
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-white rounded-2xl shadow-2xl border border-neutral-200 p-4 z-[100] animate-slide-up">
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-elavon-navy to-elavon-navy-light flex items-center justify-center">
-          <Download size={20} className="text-elavon-teal-light" />
+        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-elavon-navy flex items-center justify-center">
+          <ElavonLogo size={24} color="#FFFFFF" />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-600 text-sm text-neutral-900">Install Cloud POS</h3>

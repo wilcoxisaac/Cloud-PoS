@@ -9,7 +9,7 @@ const TIERS = [
   { name: 'Bronze', icon: Shield, min: 0, max: 499, multiplier: 1, color: '#CD7F32', bg: '#FFF3E0', perks: ['1 point per $1 spent', 'Birthday reward', 'Member discounts'] },
   { name: 'Silver', icon: Star, min: 500, max: 999, multiplier: 1.5, color: '#7B9AB5', bg: '#F5F7FA', perks: ['1.5x points', 'Free dessert on visits', 'Priority seating'] },
   { name: 'Gold', icon: Award, min: 1000, max: 2499, multiplier: 2, color: '#C06800', bg: '#FFF8E6', perks: ['2x points', 'Monthly complimentary item', 'Exclusive events access'] },
-  { name: 'Platinum', icon: Crown, min: 2500, max: Infinity, multiplier: 3, color: '#002D5C', bg: '#EBF0F7', perks: ['3x points', 'Personal concierge', 'All Gold perks + more'] },
+  { name: 'Platinum', icon: Crown, min: 2500, max: Infinity, multiplier: 3, color: '#0A1638', bg: '#EBF0F7', perks: ['3x points', 'Personal concierge', 'All Gold perks + more'] },
 ]
 
 const REWARDS = [
@@ -31,7 +31,7 @@ const RECENT_ACTIVITY = [
 ]
 
 const TIER_CONFIG = {
-  platinum: { color: '#002D5C', bg: 'bg-elavon-navy/10', text: 'text-elavon-navy' },
+  platinum: { color: '#0A1638', bg: 'bg-elavon-navy/10', text: 'text-elavon-navy' },
   gold: { color: '#C06800', bg: 'bg-warning-light', text: 'text-warning' },
   silver: { color: '#7B9AB5', bg: 'bg-neutral-100', text: 'text-neutral-600' },
   bronze: { color: '#CD7F32', bg: 'bg-orange-50', text: 'text-orange-600' },
@@ -71,10 +71,10 @@ export default function LoyaltyPage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Members', value: STATS.totalMembers, icon: Users, color: '#002D5C' },
+          { label: 'Total Members', value: STATS.totalMembers, icon: Users, color: '#0A1638' },
           { label: 'Points Issued', value: STATS.pointsIssued.toLocaleString(), icon: Star, color: '#C06800' },
           { label: 'Redemption Rate', value: STATS.redemptionRate, icon: TrendingUp, color: '#00A3AD' },
-          { label: 'Avg Points Balance', value: STATS.avgPointsBalance.toLocaleString(), icon: Award, color: '#0073B1' },
+          { label: 'Avg Points Balance', value: STATS.avgPointsBalance.toLocaleString(), icon: Award, color: '#1E3A6E' },
         ].map(m => (
           <div key={m.label} className="metric-card">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${m.color}15` }}>
@@ -115,7 +115,7 @@ export default function LoyaltyPage() {
             <h3 className="font-700 text-elavon-navy mb-5">Member Distribution by Tier</h3>
             <div className="space-y-4">
               {[
-                { tier: 'Platinum', count: 34, pct: 7.7, color: '#002D5C' },
+                { tier: 'Platinum', count: 34, pct: 7.7, color: '#0A1638' },
                 { tier: 'Gold', count: 97, pct: 22.0, color: '#C06800' },
                 { tier: 'Silver', count: 142, pct: 32.2, color: '#7B9AB5' },
                 { tier: 'Bronze', count: 168, pct: 38.1, color: '#CD7F32' },

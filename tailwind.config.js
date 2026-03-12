@@ -9,11 +9,11 @@ export default {
       colors: {
         // Elavon Primary Brand Colors
         elavon: {
-          navy: '#002D5C',
-          'navy-dark': '#001A3A',
-          'navy-light': '#003F7F',
-          blue: '#0073B1',
-          'blue-light': '#0090DB',
+          navy: '#0A1638',
+          'navy-dark': '#060E24',
+          'navy-light': '#142252',
+          blue: '#1E3A6E',
+          'blue-light': '#2B4F8C',
           teal: '#00A3AD',
           'teal-light': '#00BFC9',
           'teal-dark': '#007A83',
@@ -71,11 +71,11 @@ export default {
         'display-sm': ['1.5rem', { lineHeight: '1.3', fontWeight: '600' }],
       },
       boxShadow: {
-        'card': '0 2px 8px rgba(0, 45, 92, 0.08), 0 1px 3px rgba(0, 45, 92, 0.06)',
-        'card-hover': '0 8px 24px rgba(0, 45, 92, 0.12), 0 4px 8px rgba(0, 45, 92, 0.08)',
-        'modal': '0 20px 60px rgba(0, 45, 92, 0.2), 0 8px 24px rgba(0, 45, 92, 0.12)',
-        'dropdown': '0 8px 24px rgba(0, 45, 92, 0.15)',
-        'inner-card': 'inset 0 2px 6px rgba(0, 45, 92, 0.06)',
+        'card': '0 2px 8px rgba(10, 22, 56, 0.08), 0 1px 3px rgba(10, 22, 56, 0.06)',
+        'card-hover': '0 8px 24px rgba(10, 22, 56, 0.12), 0 4px 8px rgba(10, 22, 56, 0.08)',
+        'modal': '0 20px 60px rgba(10, 22, 56, 0.2), 0 8px 24px rgba(10, 22, 56, 0.12)',
+        'dropdown': '0 8px 24px rgba(10, 22, 56, 0.15)',
+        'inner-card': 'inset 0 2px 6px rgba(10, 22, 56, 0.06)',
       },
       borderRadius: {
         'xl2': '1rem',

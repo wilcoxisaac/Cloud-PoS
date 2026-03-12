@@ -42,9 +42,9 @@ const HOURLY_HEATMAP = [
 ]
 
 const CATEGORY_MIX = [
-  { name: 'Entrees', value: 42, color: '#002D5C' },
+  { name: 'Entrees', value: 42, color: '#0A1638' },
   { name: 'Drinks', value: 28, color: '#00A3AD' },
-  { name: 'Desserts', value: 15, color: '#0073B1' },
+  { name: 'Desserts', value: 15, color: '#1E3A6E' },
   { name: 'Salads', value: 10, color: '#00BFC9' },
   { name: 'Other', value: 5, color: '#D1DCE8' },
 ]
@@ -102,9 +102,9 @@ export default function AnalyticsPage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Revenue (Mar)', value: '$31,200', change: `${revenueGrowth > 0 ? '+' : ''}${revenueGrowth}% vs Feb`, positive: parseFloat(revenueGrowth) > 0, icon: DollarSign, color: '#002D5C' },
+          { label: 'Revenue (Mar)', value: '$31,200', change: `${revenueGrowth > 0 ? '+' : ''}${revenueGrowth}% vs Feb`, positive: parseFloat(revenueGrowth) > 0, icon: DollarSign, color: '#0A1638' },
           { label: 'Transactions', value: '441', change: '+6.3% vs Feb', positive: true, icon: ShoppingCart, color: '#00A3AD' },
-          { label: 'Avg Order Value', value: '$70.75', change: '+0.7% vs Feb', positive: true, icon: TrendingUp, color: '#0073B1' },
+          { label: 'Avg Order Value', value: '$70.75', change: '+0.7% vs Feb', positive: true, icon: TrendingUp, color: '#1E3A6E' },
           { label: 'New Customers', value: '48', change: '+12% vs Feb', positive: true, icon: Users, color: '#C06800' },
         ].map(m => (
           <div key={m.label} className="metric-card">
@@ -152,15 +152,15 @@ export default function AnalyticsPage() {
               <AreaChart data={MONTHLY_REVENUE}>
                 <defs>
                   <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#002D5C" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#002D5C" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#0A1638" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#0A1638" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#EBF0F7" />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#7B9AB5' }} axisLine={false} tickLine={false} />
                 <YAxis tickFormatter={v => `$${(v/1000).toFixed(0)}k`} tick={{ fontSize: 12, fill: '#7B9AB5' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="revenue" stroke="#002D5C" strokeWidth={2} fill="url(#revenueGrad)" name="Revenue" />
+                <Area type="monotone" dataKey="revenue" stroke="#0A1638" strokeWidth={2} fill="url(#revenueGrad)" name="Revenue" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -174,7 +174,7 @@ export default function AnalyticsPage() {
                   <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#7B9AB5' }} axisLine={false} tickLine={false} />
                   <YAxis tickFormatter={v => `$${(v/1000).toFixed(1)}k`} tick={{ fontSize: 12, fill: '#7B9AB5' }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="thisWeek" fill="#002D5C" radius={[4, 4, 0, 0]} name="This Week" />
+                  <Bar dataKey="thisWeek" fill="#0A1638" radius={[4, 4, 0, 0]} name="This Week" />
                   <Bar dataKey="lastWeek" fill="#D1DCE8" radius={[4, 4, 0, 0]} name="Last Week" />
                 </BarChart>
               </ResponsiveContainer>
@@ -266,8 +266,8 @@ export default function AnalyticsPage() {
             <h3 className="font-700 text-elavon-navy">Customer Segments</h3>
             {[
               { label: 'New Customers', pct: 28, count: 124, color: '#00A3AD' },
-              { label: 'Returning (2–5x)', pct: 42, count: 186, color: '#002D5C' },
-              { label: 'Loyal (6–20x)', pct: 22, count: 97, color: '#0073B1' },
+              { label: 'Returning (2–5x)', pct: 42, count: 186, color: '#0A1638' },
+              { label: 'Loyal (6–20x)', pct: 22, count: 97, color: '#1E3A6E' },
               { label: 'VIP (20x+)', pct: 8, count: 34, color: '#C06800' },
             ].map(seg => (
               <div key={seg.label}>

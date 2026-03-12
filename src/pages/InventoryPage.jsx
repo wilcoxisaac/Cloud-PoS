@@ -81,8 +81,8 @@ export default function InventoryPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="metric-card">
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#002D5C15' }}>
-              <Package size={20} style={{ color: '#002D5C' }} />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#0A163815' }}>
+              <Package size={20} style={{ color: '#0A1638' }} />
             </div>
           </div>
           <div className="mt-4">

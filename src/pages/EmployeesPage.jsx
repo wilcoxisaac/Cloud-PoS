@@ -70,9 +70,9 @@ export default function EmployeesPage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Active Staff', value: activeCount, icon: Users, color: '#002D5C' },
+          { label: 'Active Staff', value: activeCount, icon: Users, color: '#0A1638' },
           { label: 'Clocked In Now', value: clockedInCount, icon: Clock, color: '#00A3AD' },
-          { label: 'Hours This Week', value: totalWeeklyHours, icon: Calendar, color: '#0073B1' },
+          { label: 'Hours This Week', value: totalWeeklyHours, icon: Calendar, color: '#1E3A6E' },
           { label: 'Weekly Payroll Est.', value: `$${totalWeeklyPayroll.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: DollarSign, color: '#C06800' },
         ].map(m => (
           <div key={m.label} className="metric-card">

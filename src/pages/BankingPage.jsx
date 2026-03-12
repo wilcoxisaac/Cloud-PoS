@@ -55,7 +55,7 @@ export default function BankingPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #001A3A 0%, #002D5C 50%, #003F7F 100%)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #060E24 0%, #0A1638 50%, #142252 100%)' }}>
         <div className="p-4 sm:p-6">
           <div className="flex items-start justify-between mb-8">
             <div>
@@ -110,7 +110,7 @@ export default function BankingPage() {
           { label: 'Deposits (7d)', value: `$${totalDeposits.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: ArrowDownLeft, color: '#00875A', bg: '#E8F8F0' },
           { label: 'Withdrawals (7d)', value: `$${totalWithdrawals.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: ArrowUpRight, color: '#DE350B', bg: '#FFECEB' },
           { label: 'Pending', value: `$${pendingAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: Clock, color: '#FF8B00', bg: '#FFF8E6' },
-          { label: 'Elavon Fees (7d)', value: '$677.50', icon: CreditCard, color: '#002D5C', bg: '#002D5C15' },
+          { label: 'Elavon Fees (7d)', value: '$677.50', icon: CreditCard, color: '#0A1638', bg: '#0A163815' },
         ].map(m => (
           <div key={m.label} className="metric-card">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: m.bg }}>
