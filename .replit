@@ -56,7 +56,6 @@ externalPort = 4200
 [deployment]
 deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
-publicDir = "dist"
 run = ["node", "server/index.js"]
 
 [userenv]
