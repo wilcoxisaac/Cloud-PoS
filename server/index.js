@@ -311,7 +311,6 @@ app.use((req, res, next) => {
 })
 
 const PORT = process.env.PORT || 3001
-const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost'
-app.listen(PORT, HOST, () => {
-  console.log(`Cloud POS API server running on http://${HOST}:${PORT}`)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Cloud POS API server running on http://localhost:${PORT}`)
 })
