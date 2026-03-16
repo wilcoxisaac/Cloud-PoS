@@ -8,10 +8,12 @@ import {
   TrendingUp, TrendingDown, DollarSign, ShoppingCart,
   Users, Clock, ArrowRight, Zap, AlertTriangle,
   Star, Package, Calendar, ChevronRight,
-  X, Minus, Plus, CheckCircle, Award, Crown, ExternalLink, Truck
+  X, Minus, Plus, CheckCircle, Award, Crown, ExternalLink, Truck,
+  CreditCard, Banknote, Smartphone, Gift, FileText
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { usePOS } from '../context/POSContext'
+import { SIM_DAILY_TOTAL } from '../lib/dataSimulator'
 
 const LOW_STOCK_ITEMS = [
   { id: 1, name: 'House Wine (Red)', sku: 'BVG-001', quantity: 3, min: 10, max: 50, cost: 12.00, unit: 'bottle', supplier: 'Valley Wines Co.', status: 'critical' },
@@ -25,6 +27,26 @@ const NEW_GOLD_CUSTOMERS = [
   { name: 'James Mitchell', points: 1015, previousTier: 'Silver', visits: 38, totalSpent: 2190.00, reachedAt: '1:47 PM' },
   { name: 'Lisa Nguyen', points: 1003, previousTier: 'Silver', visits: 44, totalSpent: 2512.75, reachedAt: '3:12 PM' },
 ]
+
+const TENDER_ICONS = {
+  'Credit Card': CreditCard,
+  'Debit Card': CreditCard,
+  'Cash': Banknote,
+  'Gift Card': Gift,
+  'Apple Pay': Smartphone,
+  'Google Pay': Smartphone,
+  'Check': FileText,
+}
+
+const TENDER_COLORS = {
+  'Credit Card': '#0A1638',
+  'Debit Card': '#1E3A6E',
+  'Cash': '#00875A',
+  'Gift Card': '#FF8B00',
+  'Apple Pay': '#333333',
+  'Google Pay': '#4285F4',
+  'Check': '#7B9AB5',
+}
 
 function isToday(dateStr) {
   const d = new Date(dateStr)
@@ -88,7 +110,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         <p className="font-600 text-elavon-navy mb-1">{label}</p>
         {payload.map((p, i) => (
           <p key={i} className="text-neutral-600">
-            {p.name}: <span className="font-600">${p.value.toLocaleString()}</span>
+            {p.name}: <span className="font-600">${typeof p.value === 'number' ? p.value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : p.value}</span>
           </p>
         ))}
       </div>
@@ -271,9 +293,11 @@ function GoldCustomersModal({ onClose, navigate }) {
   )
 }
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 export default function DashboardPage() {
   const { business } = useApp()
-  const { transactions, customers } = usePOS()
+  const { transactions, customers, historicalSummaries } = usePOS()
   const navigate = useNavigate()
   const [timeRange, setTimeRange] = useState('today')
   const [showReorder, setShowReorder] = useState(false)
@@ -317,17 +341,55 @@ export default function DashboardPage() {
     return days.map((day, i) => {
       const dayDate = new Date(startOfWeek)
       dayDate.setDate(startOfWeek.getDate() + i)
-      const dayTxs = transactions.filter(tx => {
+      const dateStr = dayDate.toISOString().split('T')[0]
+
+      const txSales = transactions.filter(tx => {
         if (!tx.timestamp) return false
         const d = new Date(tx.timestamp)
         return d.getFullYear() === dayDate.getFullYear() && d.getMonth() === dayDate.getMonth() && d.getDate() === dayDate.getDate()
       })
-      const sales = dayTxs.reduce((sum, tx) => sum + (tx.total || 0), 0)
-      return { day, sales: Math.round(sales * 100) / 100, transactions: dayTxs.length }
+      let sales = txSales.reduce((sum, tx) => sum + (tx.total || 0), 0)
+      let txCount = txSales.length
+
+      if (txCount === 0 && historicalSummaries.length > 0) {
+        const summary = historicalSummaries.find(s => s.date === dateStr)
+        if (summary) {
+          sales = summary.revenue
+          txCount = summary.txCount
+        }
+      }
+
+      return { day, sales: Math.round(sales * 100) / 100, transactions: txCount }
     })
-  }, [transactions])
+  }, [transactions, historicalSummaries])
 
   const weekTotal = weeklyData.reduce((sum, d) => sum + d.sales, 0)
+
+  const monthlyTrend = useMemo(() => {
+    if (!historicalSummaries.length) return []
+    const months = {}
+    historicalSummaries.forEach(s => {
+      const key = s.date.slice(0, 7)
+      if (!months[key]) months[key] = { month: key, revenue: 0, txCount: 0 }
+      months[key].revenue += s.revenue
+      months[key].txCount += s.txCount
+    })
+    const currentMonth = new Date().toISOString().slice(0, 7)
+    const thisMonthTxRevenue = transactions
+      .filter(tx => tx.timestamp && isThisMonth(tx.timestamp))
+      .reduce((s, tx) => s + (tx.total || 0), 0)
+    if (!months[currentMonth]) months[currentMonth] = { month: currentMonth, revenue: 0, txCount: 0 }
+    months[currentMonth].revenue = thisMonthTxRevenue
+    months[currentMonth].txCount = transactions.filter(tx => tx.timestamp && isThisMonth(tx.timestamp)).length
+
+    return Object.values(months).sort((a, b) => a.month.localeCompare(b.month)).slice(-12).map(m => ({
+      ...m,
+      label: MONTH_NAMES[parseInt(m.month.split('-')[1]) - 1],
+      revenue: Math.round(m.revenue),
+    }))
+  }, [historicalSummaries, transactions])
+
+  const yearTotal = monthlyTrend.reduce((s, m) => s + m.revenue, 0)
 
   const categoryData = useMemo(() => {
     const todayTxs = transactions.filter(tx => tx.timestamp && isToday(tx.timestamp))
@@ -353,6 +415,28 @@ export default function DashboardPage() {
     }))
   }, [transactions])
 
+  const tenderBreakdown = useMemo(() => {
+    const todayTxs = transactions.filter(tx => tx.timestamp && isToday(tx.timestamp))
+    const methods = {}
+    todayTxs.forEach(tx => {
+      const m = tx.payment_method || 'Other'
+      if (!methods[m]) methods[m] = { amount: 0, count: 0 }
+      methods[m].amount += tx.total || 0
+      methods[m].count += 1
+    })
+    const total = Object.values(methods).reduce((s, v) => s + v.amount, 0) || 1
+    return Object.entries(methods)
+      .sort((a, b) => b[1].amount - a[1].amount)
+      .map(([name, data]) => ({
+        name,
+        amount: Math.round(data.amount * 100) / 100,
+        count: data.count,
+        pct: Math.round((data.amount / total) * 100),
+        color: TENDER_COLORS[name] || '#7B9AB5',
+        icon: TENDER_ICONS[name] || CreditCard,
+      }))
+  }, [transactions])
+
   const topItems = useMemo(() => {
     const filterFn = timeRange === 'today' ? isToday : timeRange === 'week' ? isThisWeek : isThisMonth
     const filtered = transactions.filter(tx => tx.timestamp && filterFn(tx.timestamp))
@@ -368,9 +452,7 @@ export default function DashboardPage() {
       }
     })
     const sorted = Object.values(items).sort((a, b) => b.revenue - a.revenue).slice(0, 5)
-    if (sorted.length === 0) {
-      return []
-    }
+    if (sorted.length === 0) return []
     return sorted
   }, [transactions, timeRange])
 
@@ -391,8 +473,9 @@ export default function DashboardPage() {
       { id: 'reorder', type: 'warning', icon: AlertTriangle, msg: 'House Wine stock critical (3 bottles)', action: 'Reorder' },
       { id: 'gold', type: 'info', icon: Star, msg: '3 customers reached Gold tier today', action: 'View' },
     ]
-    const pct = metrics.revenue > 0 ? Math.min(Math.round((metrics.revenue / 16500) * 100), 100) : 0
-    list.push({ id: 'target', type: pct >= 100 ? 'success' : 'info', icon: Zap, msg: `Daily sales target ${pct}% achieved`, action: null })
+    const target = SIM_DAILY_TOTAL + 4700
+    const pct = metrics.revenue > 0 ? Math.min(Math.round((metrics.revenue / target) * 100), 100) : 0
+    list.push({ id: 'target', type: pct >= 80 ? 'success' : 'info', icon: Zap, msg: `Daily sales target ${pct}% achieved`, action: null })
     return list
   }, [metrics.revenue])
 
@@ -450,8 +533,8 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard icon={DollarSign} label={`${timeRange === 'today' ? "Today's" : timeRange === 'week' ? "This Week's" : "This Month's"} Revenue`} value={metrics.revenue} color="#0A1638" />
-        <MetricCard icon={ShoppingCart} label="Transactions" value={metrics.txCount} prefix="" color="#00A3AD" raw />
-        <MetricCard icon={Users} label="Customers Served" value={metrics.customersServed} prefix="" color="#1E3A6E" raw />
+        <MetricCard icon={ShoppingCart} label="Transactions" value={metrics.txCount.toLocaleString()} prefix="" color="#00A3AD" raw />
+        <MetricCard icon={Users} label="Customers Served" value={metrics.customersServed.toLocaleString()} prefix="" color="#1E3A6E" raw />
         <MetricCard icon={Clock} label="Avg Order Value" value={metrics.avgOrder} color="#00875A" />
       </div>
 
@@ -506,19 +589,76 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {monthlyTrend.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="card p-5 lg:col-span-2">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-600 text-elavon-navy">12-Month Revenue</h3>
+              <span className="text-xs text-neutral-400 font-500">
+                YTD: ${(yearTotal / 1000).toFixed(0)}K
+              </span>
+            </div>
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={monthlyTrend} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#EBF0F7" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#7B9AB5' }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#7B9AB5' }} tickLine={false} axisLine={false} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="revenue" name="Revenue" fill="#00A3AD" radius={[4, 4, 0, 0]} maxBarSize={36} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="card p-5">
+            <h3 className="font-600 text-elavon-navy mb-4">Payment Methods</h3>
+            {tenderBreakdown.length > 0 ? (
+              <div className="space-y-3">
+                {tenderBreakdown.map((t, i) => {
+                  const Icon = t.icon
+                  return (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${t.color}12` }}>
+                        <Icon size={14} style={{ color: t.color }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-600 text-neutral-800">{t.name}</span>
+                          <span className="text-xs font-600 text-elavon-navy">{t.pct}%</span>
+                        </div>
+                        <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all" style={{ width: `${t.pct}%`, background: t.color }} />
+                        </div>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <div className="text-xs font-700 text-elavon-navy text-money">${t.amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+                        <div className="text-xs text-neutral-400">{t.count} tx</div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="h-32 flex items-center justify-center text-neutral-400 text-sm">
+                No transactions yet
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="card p-5">
           <div className="flex items-center justify-between mb-5">
             <h3 className="font-600 text-elavon-navy">This Week</h3>
-            <span className="text-xs text-neutral-400 font-500">{weeklyData.reduce((s, d) => s + d.transactions, 0)} transactions</span>
+            <span className="text-xs text-neutral-400 font-500">{weeklyData.reduce((s, d) => s + d.transactions, 0).toLocaleString()} transactions</span>
           </div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={weeklyData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#EBF0F7" vertical={false} />
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#7B9AB5' }} tickLine={false} axisLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#7B9AB5' }} tickLine={false} axisLine={false} tickFormatter={v => v > 0 ? `$${(v/1000).toFixed(0)}k` : '$0'} />
+              <YAxis tick={{ fontSize: 11, fill: '#7B9AB5' }} tickLine={false} axisLine={false} tickFormatter={v => v > 0 ? `$${(v / 1000).toFixed(0)}k` : '$0'} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="sales" fill="#0A1638" radius={[4, 4, 0, 0]} maxBarSize={32} />
+              <Bar dataKey="sales" name="Sales" fill="#0A1638" radius={[4, 4, 0, 0]} maxBarSize={32} />
             </BarChart>
           </ResponsiveContainer>
           <div className="mt-4 pt-4 border-t border-neutral-100 flex justify-between">
@@ -527,7 +667,7 @@ export default function DashboardPage() {
               <div className="text-xs text-neutral-400">Week Total</div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-neutral-400">{weeklyData.reduce((s, d) => s + d.transactions, 0)} sales</div>
+              <div className="text-xs text-neutral-400">{weeklyData.reduce((s, d) => s + d.transactions, 0).toLocaleString()} sales</div>
             </div>
           </div>
         </div>
@@ -547,7 +687,7 @@ export default function DashboardPage() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-600 text-neutral-800 truncate">{item.name}</div>
-                    <div className="text-xs text-neutral-400">{item.sales} sold</div>
+                    <div className="text-xs text-neutral-400">{item.sales.toLocaleString()} sold</div>
                   </div>
                   <div className="text-right">
                     <div className="text-xs font-700 text-elavon-navy text-money">${item.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
