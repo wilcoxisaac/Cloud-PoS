@@ -33,7 +33,6 @@ src/
   lib/
     offlineStorage.js   - IndexedDB wrapper for offline data persistence
     syncManager.js      - Background sync queue processor
-    dataSimulator.js    - Historical data generator + daily transaction simulator
   pages/               - Page components (all mobile responsive)
   styles/
     index.css          - Global styles + standalone mode safe area insets
@@ -90,18 +89,6 @@ All endpoints are prefixed with `/api`:
 - Build: `npm run build` -> `dist/`
 - Run: `node server/index.js` (serves static files + API on port 5000)
 - Production PORT env var set to 5000
-
-## Data Simulation
-
-- **Historical Data**: On first load, generates 365 daily summaries ($4.8M annual) + 30 days of individual transactions (~8,400 records) stored in IndexedDB
-- **Daily Simulator**: Background job runs every 4 minutes, adds transactions based on hourly weights targeting ~$8,430/day total sales ($2M annual card processing volume / 65% card share)
-- **Tender Mix**: Credit Card 45%, Debit Card 20%, Cash 25%, Gift Card 5%, Apple Pay 3%, Google Pay 1%, Check 1%
-- **Hourly Distribution**: Weighted peaks at lunch (11am-2pm) and dinner (5-8pm); quiet early morning and late evening
-- **Day/Month Variance**: Day-of-week multipliers (weekends busier) + monthly seasonality (summer/holiday peaks)
-- **Backfill**: On app load, backfills simulated transactions for hours already passed today
-- **Coexistence**: Simulated transactions marked with `simulated: true`; manual POS orders merge seamlessly
-- **IndexedDB Save Debounce**: Transaction saves debounced at 500ms to prevent excessive writes from simulator
-- **Dashboard**: 12-Month Revenue trend chart + Payment Methods breakdown from historical summaries
 
 ## Offline Architecture
 
