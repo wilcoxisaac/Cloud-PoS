@@ -17,13 +17,12 @@ const CATEGORIES_BY_TYPE = {
 const QUICK_AMOUNTS = [20, 50, 100, 'Exact']
 const TIP_PRESETS = [0, 15, 18, 20, 25]
 
-function PaymentModal({ total, onClose, onComplete }) {
+function PaymentModal({ total, cartItems, subtotal, discountAmount, taxAmount, customer, tableName, onClose, onComplete }) {
   const [method, setMethod] = useState('card')
   const [cashInput, setCashInput] = useState('')
   const [tipPct, setTipPct] = useState(0)
   const [processing, setProcessing] = useState(false)
   const [done, setDone] = useState(false)
-  const [receiptMethod, setReceiptMethod] = useState(null)
 
   const tipAmount = (total * tipPct) / 100
   const finalTotal = total + tipAmount
@@ -36,6 +35,65 @@ function PaymentModal({ total, onClose, onComplete }) {
     setProcessing(false)
     setDone(true)
     onComplete(method, method === 'cash' ? cashAmt : finalTotal)
+  }
+
+  function handlePrint() {
+    const receiptLines = (cartItems || []).map(i =>
+      `<div class="item"><span>${i.name} ×${i.qty}</span><span>$${(i.price * i.qty).toFixed(2)}</span></div>`
+    ).join('')
+    const html = `<html><head><title>Receipt</title><style>
+      body{font-family:monospace;width:300px;margin:0 auto;padding:20px;font-size:13px}
+      h2{text-align:center;margin:0 0 4px}
+      p{text-align:center;margin:2px 0;color:#555}
+      .divider{border-top:1px dashed #999;margin:10px 0}
+      .item{display:flex;justify-content:space-between;padding:2px 0}
+      .bold{font-weight:700;font-size:1.05em}
+    </style></head><body>
+      <h2>Cloud PoS</h2>
+      <p>${new Date().toLocaleString()}</p>
+      ${tableName ? `<p>Table: ${tableName}</p>` : ''}
+      ${customer ? `<p>Customer: ${customer.name}</p>` : ''}
+      <div class="divider"></div>
+      ${receiptLines}
+      <div class="divider"></div>
+      <div class="item"><span>Subtotal</span><span>$${(subtotal || 0).toFixed(2)}</span></div>
+      ${discountAmount > 0 ? `<div class="item"><span>Discount</span><span>-$${discountAmount.toFixed(2)}</span></div>` : ''}
+      <div class="item"><span>Tax (8.875%)</span><span>$${(taxAmount || 0).toFixed(2)}</span></div>
+      ${tipAmount > 0 ? `<div class="item"><span>Tip (${tipPct}%)</span><span>$${tipAmount.toFixed(2)}</span></div>` : ''}
+      <div class="divider"></div>
+      <div class="item bold"><span>TOTAL</span><span>$${finalTotal.toFixed(2)}</span></div>
+      <div class="item"><span>Paid via</span><span>${method === 'card' ? 'Card · Elavon' : method === 'cash' ? 'Cash' : 'Digital Wallet'}</span></div>
+      <div class="divider"></div>
+      <p>Thank you for your business!</p>
+    </body></html>`
+    const win = window.open('', '_blank', 'width=420,height=620')
+    win.document.write(html)
+    win.document.close()
+    win.print()
+  }
+
+  function handleEmail() {
+    const lines = [
+      '=== RECEIPT ===',
+      `Date: ${new Date().toLocaleString()}`,
+      tableName ? `Table: ${tableName}` : '',
+      customer ? `Customer: ${customer.name}` : '',
+      '',
+      ...(cartItems || []).map(i => `${i.name} ×${i.qty}  $${(i.price * i.qty).toFixed(2)}`),
+      '',
+      `Subtotal: $${(subtotal || 0).toFixed(2)}`,
+      discountAmount > 0 ? `Discount: -$${discountAmount.toFixed(2)}` : '',
+      `Tax (8.875%): $${(taxAmount || 0).toFixed(2)}`,
+      tipAmount > 0 ? `Tip (${tipPct}%): $${tipAmount.toFixed(2)}` : '',
+      `TOTAL: $${finalTotal.toFixed(2)}`,
+      `Paid via: ${method === 'card' ? 'Card · Elavon' : method === 'cash' ? 'Cash' : 'Digital Wallet'}`,
+      '',
+      'Thank you for your business!',
+    ].filter(l => l !== null && l !== undefined && !(l === '' && false))
+    const to = customer?.email || ''
+    const subject = encodeURIComponent(`Receipt – $${finalTotal.toFixed(2)}`)
+    const body = encodeURIComponent(lines.filter(Boolean).join('\n'))
+    window.location.href = `mailto:${to}?subject=${subject}&body=${body}`
   }
 
   if (done) {
@@ -55,10 +113,10 @@ function PaymentModal({ total, onClose, onComplete }) {
             )}
             <div className="mt-6 space-y-2 w-full">
               <div className="flex gap-2">
-                <button onClick={() => setReceiptMethod('print')} className="btn-secondary flex-1 justify-center">
+                <button onClick={handlePrint} className="btn-secondary flex-1 justify-center">
                   <Printer size={15} /> Print Receipt
                 </button>
-                <button onClick={() => setReceiptMethod('email')} className="btn-secondary flex-1 justify-center">
+                <button onClick={handleEmail} className="btn-secondary flex-1 justify-center">
                   <Mail size={15} /> Email
                 </button>
               </div>
@@ -456,6 +514,12 @@ export default function POSPage() {
       {showPayment && (
         <PaymentModal
           total={total}
+          cartItems={cart.items}
+          subtotal={subtotal}
+          discountAmount={discountAmount}
+          taxAmount={taxAmount}
+          customer={cart.customer}
+          tableName={cart.tableName}
           onClose={() => setShowPayment(false)}
           onComplete={handlePaymentComplete}
         />
