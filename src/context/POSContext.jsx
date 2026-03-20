@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useReducer, useEffect, useRef } from 'react'
+import React, { createContext, useContext, useState, useCallback, useReducer, useEffect } from 'react'
 import { saveAppState, loadAppState, addToSyncQueue } from '../lib/offlineStorage'
-import { seedHistorical, backfillToday, startSimInterval } from '../lib/dataSimulator'
 
 const POSContext = createContext(null)
 
@@ -91,56 +90,25 @@ export function POSProvider({ children }) {
   const [products, setProducts] = useState(SAMPLE_PRODUCTS)
   const [customers, setCustomersState] = useState(SAMPLE_CUSTOMERS)
   const [transactions, setTransactionsState] = useState([])
-  const [historicalSummaries, setHistoricalSummaries] = useState([])
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [activeCategory, setActiveCategory] = useState('All')
-  const [dataReady, setDataReady] = useState(false)
-
-  const productsRef = useRef(SAMPLE_PRODUCTS)
-  const customersRef = useRef(SAMPLE_CUSTOMERS)
-
-  useEffect(() => { productsRef.current = products }, [products])
-  useEffect(() => { customersRef.current = customers }, [customers])
 
   useEffect(() => {
-    async function init() {
+    async function loadSavedData() {
       try {
-        const [savedCustomers, savedProducts] = await Promise.all([
+        const [savedCustomers, savedTransactions, savedProducts] = await Promise.all([
           loadAppState('customers'),
+          loadAppState('transactions'),
           loadAppState('products'),
         ])
-
-        const curProds = savedProducts || SAMPLE_PRODUCTS
-        const curCusts = savedCustomers || SAMPLE_CUSTOMERS
-
         if (savedCustomers) setCustomersState(savedCustomers)
+        if (savedTransactions) setTransactionsState(savedTransactions)
         if (savedProducts) setProducts(savedProducts)
-        productsRef.current = curProds
-        customersRef.current = curCusts
-
-        const hist = await seedHistorical(curProds, curCusts)
-        setHistoricalSummaries(hist.summaries)
-
-        let txs
-        if (hist.alreadySeeded) {
-          txs = (await loadAppState('transactions')) || []
-        } else {
-          txs = hist.transactions || []
-        }
-
-        const bf = backfillToday(curProds, curCusts, txs)
-        if (bf.length) {
-          txs = [...bf, ...txs]
-          saveAppState('transactions', txs).catch(() => {})
-        }
-
-        setTransactionsState(txs)
       } catch (e) {
-        console.log('Failed to load POS data:', e)
+        console.log('Failed to load offline POS data:', e)
       }
-      setDataReady(true)
     }
-    init()
+    loadSavedData()
   }, [])
 
   const setCustomers = useCallback((updater) => {
@@ -151,25 +119,13 @@ export function POSProvider({ children }) {
     })
   }, [])
 
-  const saveTimeoutRef = useRef(null)
   const setTransactions = useCallback((updater) => {
     setTransactionsState((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : updater
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
-      saveTimeoutRef.current = setTimeout(() => {
-        saveAppState('transactions', next).catch(() => {})
-      }, 500)
+      saveAppState('transactions', next).catch(() => {})
       return next
     })
   }, [])
-
-  useEffect(() => {
-    if (!dataReady) return
-    const cleanup = startSimInterval(productsRef, customersRef, (tx) => {
-      setTransactions(prev => [tx, ...prev])
-    })
-    return cleanup
-  }, [dataReady, setTransactions])
 
   const addToCart = useCallback((item) => dispatch({ type: 'ADD_ITEM', item }), [])
   const removeFromCart = useCallback((id) => dispatch({ type: 'REMOVE_ITEM', id }), [])
@@ -232,13 +188,13 @@ export function POSProvider({ children }) {
 
   return (
     <POSContext.Provider value={{
-      cart, products, customers, setCustomers, transactions, historicalSummaries,
+      cart, products, customers, setCustomers, transactions,
       addToCart, removeFromCart, updateQty, clearCart,
       setDiscount, setCustomer, setTip, setTable,
       selectedProduct, setSelectedProduct,
       activeCategory, setActiveCategory,
       subtotal, discountAmount, taxAmount, tipAmount, total,
-      completeTransaction, dataReady,
+      completeTransaction,
     }}>
       {children}
     </POSContext.Provider>
